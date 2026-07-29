@@ -1,6 +1,7 @@
 package com.aeropelican.productservice.controller;
 
-import com.aeropelican.productservice.dto.request.ProductRequestDTO;
+import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
+import com.aeropelican.productservice.dto.request.ProductUpdateRequestDTO;
 import com.aeropelican.productservice.dto.response.ApiResponse;
 import com.aeropelican.productservice.dto.response.PageResponse;
 import com.aeropelican.productservice.dto.response.ProductResponseDTO;
@@ -53,14 +54,14 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductResponseDTO>> create(@RequestBody ProductRequestDTO request) {
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> create(@RequestBody ProductCreateRequestDTO request) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(productService.createProduct(request), "Product created successfully"));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductResponseDTO>> update(@PathVariable Integer id, @RequestBody ProductRequestDTO request) {
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> update(@PathVariable Integer id, @RequestBody ProductUpdateRequestDTO request) {
 
         return ResponseEntity.ok(ApiResponse.success(productService.updateProduct(id, request), "Product updated successfully"));
     }
