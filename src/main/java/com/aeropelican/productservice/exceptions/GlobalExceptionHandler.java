@@ -2,17 +2,24 @@ package com.aeropelican.productservice.exceptions;
 
 import com.aeropelican.productservice.dto.response.ErrorResponse;
 import com.aeropelican.productservice.dto.response.ApiResponse;
+import com.aeropelican.productservice.dto.response.FieldError;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.method.ParameterValidationResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -69,6 +76,30 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, error, message);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+
+        List<FieldError> fieldErrors =
+                ex.getBindingResult()
+                        .getFieldErrors()
+                        .stream()
+                        .map(error -> FieldError.builder()
+                                .field(error.getField())
+                                .rejectedValue(error.getRejectedValue())
+                                .message(error.getDefaultMessage())
+                                .build())
+                        .toList();
+
+        ErrorResponse error = ErrorResponse.builder()
+                .errorCode("VALIDATION_FAILED")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .path(request.getRequestURI())
+                .fieldErrors(fieldErrors)
+                .build();
+
+        return build(HttpStatus.BAD_REQUEST, error, "Validation failed");
+    }
+
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoHandlerFound(NoHandlerFoundException ex, HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
@@ -77,6 +108,47 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
         return build(HttpStatus.NOT_FOUND, error, "No handler found for this route");
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpServletRequest request) {
+
+        List<FieldError> errors = ex.getParameterValidationResults()
+                .stream()
+                .flatMap(result -> {
+                    String parameterName = result.getMethodParameter().getParameterName();
+                    Object rejectedValue = result.getArgument();
+                    return result.getResolvableErrors().stream()
+                            .map(error -> FieldError.builder()
+                                    .field(parameterName)
+                                    .rejectedValue(rejectedValue)
+                                    .message(error.getDefaultMessage())
+                                    .build()
+                            );
+                }).toList();
+
+        ErrorResponse error = ErrorResponse.builder()
+                .errorCode("ROUTE_NOT_FOUND")
+                .status(HttpStatus.NOT_FOUND.value())
+                .path(request.getRequestURI())
+                .fieldErrors(errors)
+                .build();
+
+        return build(HttpStatus.BAD_REQUEST, error, "Validation failed");
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePropertyReferenceException(PropertyReferenceException ex, HttpServletRequest request) {
+
+        String message = String.format("Invalid property '%s'. Please provide a valid property name.", ex.getPropertyName());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .errorCode("INVALID_PROPERTY")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .path(request.getRequestURI())
+                .build();
+
+        return build(HttpStatus.BAD_REQUEST, error, message);
     }
 
     @ExceptionHandler(Exception.class)

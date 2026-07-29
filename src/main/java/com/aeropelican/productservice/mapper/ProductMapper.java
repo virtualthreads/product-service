@@ -1,15 +1,14 @@
 package com.aeropelican.productservice.mapper;
 
-import com.aeropelican.productservice.dto.request.ProductRequestDTO;
+import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
 import com.aeropelican.productservice.dto.response.ProductResponseDTO;
 import com.aeropelican.productservice.entity.Product;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
 public class ProductMapper {
 
-    public static Product toEntity(ProductRequestDTO requestDTO) {
+    public static Product toEntity(ProductCreateRequestDTO requestDTO) {
         Product product = new Product();
         product.setProductName(requestDTO.getProductName());
         product.setDescription(requestDTO.getDescription());

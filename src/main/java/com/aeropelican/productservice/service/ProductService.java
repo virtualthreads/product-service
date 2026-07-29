@@ -1,6 +1,7 @@
 package com.aeropelican.productservice.service;
 
-import com.aeropelican.productservice.dto.request.ProductRequestDTO;
+import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
+import com.aeropelican.productservice.dto.request.ProductUpdateRequestDTO;
 import com.aeropelican.productservice.dto.response.PageResponse;
 import com.aeropelican.productservice.dto.response.ProductResponseDTO;
 import com.aeropelican.productservice.entity.Category;
@@ -50,7 +51,7 @@ public class ProductService {
     }
 
 
-    public ProductResponseDTO createProduct(ProductRequestDTO request) {
+    public ProductResponseDTO createProduct(ProductCreateRequestDTO request) {
 
         String productName = request.getProductName().trim();
 
@@ -69,7 +70,7 @@ public class ProductService {
         return ProductMapper.toResponseDTO(productRepository.save(product));
     }
 
-    public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO request) {
+    public ProductResponseDTO updateProduct(Integer id, ProductUpdateRequestDTO request) {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", String.valueOf(id)));
