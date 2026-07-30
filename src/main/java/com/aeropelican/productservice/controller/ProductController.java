@@ -2,7 +2,7 @@ package com.aeropelican.productservice.controller;
 
 import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
 import com.aeropelican.productservice.dto.request.ProductUpdateRequestDTO;
-import com.aeropelican.productservice.dto.response.ApiResponse;
+import com.aeropelican.productservice.dto.response.APIResponse;
 import com.aeropelican.productservice.dto.response.PageResponse;
 import com.aeropelican.productservice.dto.response.ProductResponseDTO;
 import com.aeropelican.productservice.service.ProductService;
@@ -21,7 +21,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/{page}/{size}/{sortBy}/{sortDir}")
-    public ResponseEntity<ApiResponse<PageResponse<ProductResponseDTO>>> getAllProducts(
+    public ResponseEntity<APIResponse<PageResponse<ProductResponseDTO>>> getAllProducts(
             @PathVariable Integer page,
             @PathVariable Integer size,
             @PathVariable String sortBy,
@@ -30,7 +30,7 @@ public class ProductController {
         PageResponse<ProductResponseDTO> result = productService.listProducts(page, size, sortBy, sortDir);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.<PageResponse<ProductResponseDTO>>builder()
+                .body(APIResponse.<PageResponse<ProductResponseDTO>>builder()
                         .success(true)
                         .message("Product details fetched successfully")
                         .data(result)
@@ -40,11 +40,11 @@ public class ProductController {
     }
 
     @GetMapping("/{pid}")
-    public ResponseEntity<ApiResponse<ProductResponseDTO>> getProduct(@PathVariable(name = "pid") Integer productId) {
+    public ResponseEntity<APIResponse<ProductResponseDTO>> getProduct(@PathVariable(name = "pid") Long productId) {
         ProductResponseDTO product = productService.getProduct(productId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.<ProductResponseDTO>builder()
+                .body(APIResponse.<ProductResponseDTO>builder()
                         .success(true)
                         .message("Product found")
                         .data(product)
@@ -54,15 +54,15 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductResponseDTO>> create(@RequestBody ProductCreateRequestDTO request) {
+    public ResponseEntity<APIResponse<ProductResponseDTO>> create(@RequestBody ProductCreateRequestDTO request) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(productService.createProduct(request), "Product created successfully"));
+                .body(APIResponse.success(productService.createProduct(request), "Product created successfully"));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductResponseDTO>> update(@PathVariable Integer id, @RequestBody ProductUpdateRequestDTO request) {
+    public ResponseEntity<APIResponse<ProductResponseDTO>> update(@PathVariable Long id, @RequestBody ProductUpdateRequestDTO request) {
 
-        return ResponseEntity.ok(ApiResponse.success(productService.updateProduct(id, request), "Product updated successfully"));
+        return ResponseEntity.ok(APIResponse.success(productService.updateProduct(id, request), "Product updated successfully"));
     }
 }

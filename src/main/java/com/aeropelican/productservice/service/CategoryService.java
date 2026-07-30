@@ -25,7 +25,7 @@ public class CategoryService {
 
     public CategoryResponseDTO getCategory(Long catId) {
         return categoryRepository.findById(catId)
-                .map(CategoryMapper::toDTO)
+                .map(CategoryMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(catId)));
 
     }
@@ -38,7 +38,7 @@ public class CategoryService {
         Page<Category> pageResult = categoryRepository.findAll(pageable);
 
         List<CategoryResponseDTO> content = pageResult.stream()
-                .map(CategoryMapper::toDTO)
+                .map(CategoryMapper::toResponse)
                 .toList();
         return PageResponseMapper.toPageResponse(pageResult, content);
     }
@@ -56,7 +56,7 @@ public class CategoryService {
         Category category = CategoryMapper.toEntity(request);
         category = categoryRepository.save(category);
 
-        return CategoryMapper.toDTO(category);
+        return CategoryMapper.toResponse(category);
     }
 
     public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO request) {
@@ -90,6 +90,6 @@ public class CategoryService {
             category.setIsActive(request.getActive());
         }
 
-        return CategoryMapper.toDTO(categoryRepository.save(category));
+        return CategoryMapper.toResponse(categoryRepository.save(category));
     }
 }

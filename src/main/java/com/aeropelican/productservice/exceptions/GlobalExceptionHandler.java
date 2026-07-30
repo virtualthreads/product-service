@@ -1,14 +1,13 @@
 package com.aeropelican.productservice.exceptions;
 
 import com.aeropelican.productservice.dto.response.ErrorResponse;
-import com.aeropelican.productservice.dto.response.ApiResponse;
+import com.aeropelican.productservice.dto.response.APIResponse;
 import com.aeropelican.productservice.dto.response.FieldError;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,14 +17,13 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode("RESOURCE_NOT_FOUND")
                 .status(HttpStatus.NOT_FOUND.value())
@@ -33,7 +31,7 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.<Void>builder()
+                .body(APIResponse.<Void>builder()
                         .success(false)
                         .error(errorResponse)
                         .message(ex.getMessage())
@@ -43,7 +41,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode("BAD_REQUEST")
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -54,7 +52,7 @@ public class GlobalExceptionHandler {
 
     // Generic Exceptions
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMissingParams(MissingServletRequestParameterException ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handleMissingParams(MissingServletRequestParameterException ex, HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
                 .errorCode("MISSING_PARAMETER")
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -64,7 +62,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
 
         String message = String.format("Parameter '%s' should be of type %s", ex.getName(), ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "a different type");
 
@@ -77,7 +75,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
 
         List<FieldError> fieldErrors =
                 ex.getBindingResult()
@@ -101,7 +99,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleNoHandlerFound(NoHandlerFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handleNoHandlerFound(NoHandlerFoundException ex, HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
                 .errorCode("ROUTE_NOT_FOUND")
                 .status(HttpStatus.NOT_FOUND.value())
@@ -111,7 +109,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpServletRequest request) {
 
         List<FieldError> errors = ex.getParameterValidationResults()
                 .stream()
@@ -138,7 +136,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PropertyReferenceException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePropertyReferenceException(PropertyReferenceException ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handlePropertyReferenceException(PropertyReferenceException ex, HttpServletRequest request) {
 
         String message = String.format("Invalid property '%s'. Please provide a valid property name.", ex.getPropertyName());
 
@@ -152,7 +150,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<APIResponse<Void>> handleGenericException(Exception ex, HttpServletRequest request) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode("INTERNAL_SERVER_ERROR")
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -166,7 +164,7 @@ public class GlobalExceptionHandler {
     }
 
     //Helper methods
-    private ResponseEntity<ApiResponse<Void>> build(HttpStatus status, ErrorResponse error, String message) {
-        return ResponseEntity.status(status).body(ApiResponse.failure(message, error));
+    private ResponseEntity<APIResponse<Void>> build(HttpStatus status, ErrorResponse error, String message) {
+        return ResponseEntity.status(status).body(APIResponse.failure(message, error));
     }
 }

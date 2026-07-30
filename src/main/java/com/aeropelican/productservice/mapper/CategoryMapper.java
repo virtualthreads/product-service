@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 public class CategoryMapper {
 
-    public static CategoryResponseDTO toDTO(Category category) {
+    public static CategoryResponseDTO toResponse(Category category) {
         return CategoryResponseDTO.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getCategoryName())

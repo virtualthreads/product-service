@@ -38,15 +38,15 @@ public class ProductService {
         Page<Product> pageResult = productRepository.findAll(pageable);
 
         List<ProductResponseDTO> content = pageResult.stream()
-                .map(ProductMapper::toResponseDTO)
+                .map(ProductMapper::toResponse)
                 .toList();
         return PageResponseMapper.toPageResponse(pageResult, content);
     }
 
-    public ProductResponseDTO getProduct(Integer productId) {
+    public ProductResponseDTO getProduct(Long productId) {
         System.out.println("Attempting to fetch product with ID: " + productId);
         return productRepository.findById(productId)
-                .map(ProductMapper::toResponseDTO)
+                .map(ProductMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Product is not found for provided ID: " + productId));
     }
 
@@ -67,10 +67,10 @@ public class ProductService {
         Product product = ProductMapper.toEntity(request);
         //TODO: set category ID if present
         //product.setCategoryId(request.getCategoryId());
-        return ProductMapper.toResponseDTO(productRepository.save(product));
+        return ProductMapper.toResponse(productRepository.save(product));
     }
 
-    public ProductResponseDTO updateProduct(Integer id, ProductUpdateRequestDTO request) {
+    public ProductResponseDTO updateProduct(Long id, ProductUpdateRequestDTO request) {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", String.valueOf(id)));
@@ -96,6 +96,6 @@ public class ProductService {
             product.setIsActive(request.getIsActive());
         }
 
-        return ProductMapper.toResponseDTO(productRepository.save(product));
+        return ProductMapper.toResponse(productRepository.save(product));
     }
 }

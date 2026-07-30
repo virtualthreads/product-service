@@ -9,27 +9,27 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse<T> {
+public class APIResponse<T> {
     private boolean success;
     private String message;
     private T data;
     private ErrorResponse error;
     private LocalDateTime timestamp;
 
-    public static <T> ApiResponse<T> success(T data, String message) {
-        return ApiResponse.<T>builder()
+    public static <T> APIResponse<T> success(T data, String message) {
+        return APIResponse.<T>builder()
                 .success(true)
                 .message(message)
                 .data(data)
                 .build();
     }
 
-    public static <T> ApiResponse<T> success(T data) {
+    public static <T> APIResponse<T> success(T data) {
         return success(data, "Request processed successfully");
     }
 
-    public static ApiResponse<Void> failure(String message, ErrorResponse error) {
-        return ApiResponse.<Void>builder()
+    public static APIResponse<Void> failure(String message, ErrorResponse error) {
+        return APIResponse.<Void>builder()
                 .success(false)
                 .message(message)
                 .error(error)

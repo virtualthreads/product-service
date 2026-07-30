@@ -19,7 +19,7 @@ public class ProductMapper {
         return product;
     }
 
-    public static ProductResponseDTO toResponseDTO(Product product) {
+    public static ProductResponseDTO toResponse(Product product) {
         return ProductResponseDTO.builder()
                 .productId(product.getProductId())
                 .productName(product.getProductName())

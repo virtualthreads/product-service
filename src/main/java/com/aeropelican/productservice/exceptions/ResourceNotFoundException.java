@@ -9,4 +9,8 @@ public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String resource, String id) {
         super(resource + " not found with id: " + id);
     }
+
+    public ResourceNotFoundException(String resourceName, String fieldName, Object fieldValue) {
+        super("%s not found with %s = '%s'".formatted(resourceName, fieldName, fieldValue));
+    }
 }

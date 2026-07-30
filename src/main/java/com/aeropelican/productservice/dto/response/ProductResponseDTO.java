@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductResponseDTO {
-    private Integer productId;
+    private Long productId;
     private String productName;
     private String description;
     private String brand;
