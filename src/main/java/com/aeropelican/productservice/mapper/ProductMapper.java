@@ -1,33 +1,36 @@
 package com.aeropelican.productservice.mapper;
 
-import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
-import com.aeropelican.productservice.dto.response.ProductResponseDTO;
+import com.aeropelican.productservice.dto.request.ProductRequest;
+import com.aeropelican.productservice.dto.request.ProductResponse;
 import com.aeropelican.productservice.entity.Product;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Component
 public class ProductMapper {
 
-    public static Product toEntity(ProductCreateRequestDTO requestDTO) {
+    public Product toEntity(ProductRequest request) {
         Product product = new Product();
-        product.setProductName(requestDTO.getProductName());
-        product.setDescription(requestDTO.getDescription());
-        product.setBrand(requestDTO.getBrand());
-        product.setIsActive(requestDTO.getIsActive());
+        product.setCategoryId(request.categoryId());
+        product.setProductName(request.productName());
+        product.setDescription(request.description());
+        product.setBrand(request.brand());
+        product.setIsActive(request.isActive() != null ? request.isActive() : true);
         product.setCreateAt(LocalDateTime.now());
-        product.setUpdatedAt(LocalDateTime.now());
         return product;
     }
 
-    public static ProductResponseDTO toResponse(Product product) {
-        return ProductResponseDTO.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .description(product.getDescription())
-                .brand(product.getBrand())
-                .isActive(product.getIsActive())
-                .createAt(product.getCreateAt())
-                .updatedAt(product.getUpdatedAt())
-                .build();
+    public ProductResponse toResponse(Product product) {
+        return new ProductResponse(
+                product.getProductId(),
+                product.getCategoryId(),
+                product.getProductName(),
+                product.getDescription(),
+                product.getBrand(),
+                product.getIsActive(),
+                product.getCreateAt(),
+                product.getUpdatedAt()
+        );
     }
 }

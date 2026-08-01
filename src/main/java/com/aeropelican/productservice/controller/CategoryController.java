@@ -1,56 +1,69 @@
 package com.aeropelican.productservice.controller;
 
-import com.aeropelican.productservice.dto.request.CategoryRequestDTO;
-import com.aeropelican.productservice.dto.response.APIResponse;
-import com.aeropelican.productservice.dto.response.CategoryResponseDTO;
-import com.aeropelican.productservice.dto.response.PageResponse;
+import com.aeropelican.productservice.dto.request.CategoryRequest;
+import com.aeropelican.productservice.dto.request.ProductResponse;
+import com.aeropelican.productservice.dto.response.ApiResponse;
+import com.aeropelican.productservice.dto.response.CategoryResponse;
 import com.aeropelican.productservice.service.CategoryService;
+import com.aeropelican.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/v1/category")
+@RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
 public class CategoryController {
+
     private final CategoryService categoryService;
+    private final ProductService productService;
 
-    @GetMapping("/{page}/{size}/{sortBy}/{sortDir}")
-    public ResponseEntity<APIResponse<PageResponse<CategoryResponseDTO>>> getAllCategories(
-            @PathVariable Integer page,
-            @PathVariable Integer size,
-            @PathVariable String sortBy,
-            @PathVariable String sortDir) {
-
-        PageResponse<CategoryResponseDTO> result = categoryService.fetchAllCategories(page, size, sortBy, sortDir);
-        return ResponseEntity.ok(APIResponse.success(
-                result,
-                "Categories fetched successfully"
-        ));
+    @PostMapping
+    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@RequestBody CategoryRequest request) {
+        CategoryResponse saved = categoryService.createCategory(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(saved, "Category created"));
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<APIResponse<CategoryResponseDTO>> getCategory(@PathVariable("categoryId") Long catId) {
-        CategoryResponseDTO category = categoryService.getCategory(catId);
-        return ResponseEntity.ok(APIResponse.success(category, "Category details fetched successfully"));
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategory(@PathVariable Long categoryId) {
+        CategoryResponse category = categoryService.getCategory(categoryId);
+        return ResponseEntity.ok(ApiResponse.success(category, "Category fetched"));
     }
 
-    @PostMapping
-    public ResponseEntity<APIResponse<CategoryResponseDTO>> createCategory(@RequestBody CategoryRequestDTO request) {
-        CategoryResponseDTO response = categoryService.createCategory(request);
-        return ResponseEntity.ok(APIResponse.success(
-                response,
-                "Category successfully created."
-        ));
+    @GetMapping("/parents")
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getParentCategories() {
+        List<CategoryResponse> results = categoryService.getParentCategories();
+        return ResponseEntity.ok(ApiResponse.success(results, "Parent categories fetched"));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<APIResponse<CategoryResponseDTO>> updateCategory(@PathVariable Long id, @RequestBody CategoryRequestDTO request) {
-        return ResponseEntity.ok(
-                APIResponse.success(
-                        categoryService.updateCategory(id, request),
-                        "Category updated successfully"
-                )
-        );
+    @GetMapping("/{categoryId}/children")
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getChildren(@PathVariable Long categoryId) {
+        List<CategoryResponse> results = categoryService.getChildren(categoryId);
+        return ResponseEntity.ok(ApiResponse.success(results, "Child categories fetched"));
+    }
+
+    @GetMapping("/{categoryId}/products")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProductsByCategory(@PathVariable Long categoryId) {
+        List<ProductResponse> results = productService.getProductsByCategory(categoryId);
+        return ResponseEntity.ok(ApiResponse.success(results, "Products fetched by category"));
+    }
+
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
+            @PathVariable Long categoryId,
+            @RequestBody CategoryRequest request) {
+        CategoryResponse updated = categoryService.updateCategory(categoryId, request);
+        return ResponseEntity.ok(ApiResponse.success(updated, "Category updated"));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long categoryId) {
+        categoryService.deleteCategory(categoryId);
+        return ResponseEntity.ok(ApiResponse.success(null, "Category deleted"));
     }
 }

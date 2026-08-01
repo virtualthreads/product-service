@@ -1,17 +1,15 @@
 package com.aeropelican.productservice.controller;
 
-import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
-import com.aeropelican.productservice.dto.request.ProductUpdateRequestDTO;
-import com.aeropelican.productservice.dto.response.APIResponse;
-import com.aeropelican.productservice.dto.response.PageResponse;
-import com.aeropelican.productservice.dto.response.ProductResponseDTO;
+import com.aeropelican.productservice.dto.request.ProductRequest;
+import com.aeropelican.productservice.dto.request.ProductResponse;
+import com.aeropelican.productservice.dto.response.ApiResponse;
 import com.aeropelican.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -20,49 +18,29 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @GetMapping("/{page}/{size}/{sortBy}/{sortDir}")
-    public ResponseEntity<APIResponse<PageResponse<ProductResponseDTO>>> getAllProducts(
-            @PathVariable Integer page,
-            @PathVariable Integer size,
-            @PathVariable String sortBy,
-            @PathVariable String sortDir) {
-
-        PageResponse<ProductResponseDTO> result = productService.listProducts(page, size, sortBy, sortDir);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(APIResponse.<PageResponse<ProductResponseDTO>>builder()
-                        .success(true)
-                        .message("Product details fetched successfully")
-                        .data(result)
-                        .timestamp(LocalDateTime.now())
-                        .build()
-                );
-    }
-
-    @GetMapping("/{pid}")
-    public ResponseEntity<APIResponse<ProductResponseDTO>> getProduct(@PathVariable(name = "pid") Long productId) {
-        ProductResponseDTO product = productService.getProduct(productId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(APIResponse.<ProductResponseDTO>builder()
-                        .success(true)
-                        .message("Product found")
-                        .data(product)
-                        .timestamp(LocalDateTime.now())
-                        .build()
-                );
-    }
-
     @PostMapping
-    public ResponseEntity<APIResponse<ProductResponseDTO>> create(@RequestBody ProductCreateRequestDTO request) {
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(APIResponse.success(productService.createProduct(request), "Product created successfully"));
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@RequestBody ProductRequest request) {
+        ProductResponse saved = productService.createProduct(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(saved, "Product created"));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<APIResponse<ProductResponseDTO>> update(@PathVariable Long id, @RequestBody ProductUpdateRequestDTO request) {
+    @GetMapping("/{productId}")
+    public ResponseEntity<ApiResponse<ProductResponse>> getProduct(@PathVariable Long productId) {
+        ProductResponse product = productService.getProduct(productId);
+        return ResponseEntity.ok(ApiResponse.success(product, "Product fetched"));
+    }
 
-        return ResponseEntity.ok(APIResponse.success(productService.updateProduct(id, request), "Product updated successfully"));
+    @GetMapping("/brands/{brand}")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProductsByBrand(@PathVariable String brand) {
+        List<ProductResponse> results = productService.getProductsByBrand(brand);
+        return ResponseEntity.ok(ApiResponse.success(results, "Products fetched by brand"));
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
+        return ResponseEntity.ok(ApiResponse.success(null, "Product deleted"));
     }
 }

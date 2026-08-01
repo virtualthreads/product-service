@@ -1,32 +1,34 @@
 package com.aeropelican.productservice.mapper;
 
-import com.aeropelican.productservice.dto.request.CategoryRequestDTO;
-import com.aeropelican.productservice.dto.response.CategoryResponseDTO;
+import com.aeropelican.productservice.dto.request.CategoryRequest;
+import com.aeropelican.productservice.dto.response.CategoryResponse;
 import com.aeropelican.productservice.entity.Category;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Component
 public class CategoryMapper {
 
-    public static CategoryResponseDTO toResponse(Category category) {
-        return CategoryResponseDTO.builder()
+    public CategoryResponse toResponse(Category category) {
+        return CategoryResponse.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getCategoryName())
-                .parentCategory(category.getParentCategory())
-                .isActive(category.getIsActive())
                 .description(category.getDescription())
-                .createAt(category.getCreateAt())
+                .parentCategoryId(category.getParentCategoryId())
+                .isActive(category.getIsActive())
+                .createdAt(category.getCreateAt())
                 .updatedAt(category.getUpdatedAt())
                 .build();
     }
 
-    public static Category toEntity(CategoryRequestDTO requestDTO) {
-        Category category = new Category();
-        category.setCategoryName(requestDTO.getCategoryName());
-        category.setDescription(requestDTO.getDescription());
-        category.setIsActive(true);
-        category.setCreateAt(LocalDateTime.now());
-        category.setUpdatedAt(LocalDateTime.now());
-        return category;
+    public Category toEntity(CategoryRequest categoryRequest) {
+        return Category.builder()
+                .categoryName(categoryRequest.categoryName())
+                .description(categoryRequest.description())
+                .parentCategoryId(categoryRequest.parentCategoryId())
+                .isActive(false)
+                .createAt(LocalDateTime.now())
+                .build();
     }
 }

@@ -6,6 +6,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 
 @Builder
@@ -21,14 +22,11 @@ public class ProductVariant {
     @Column(name = "variant_id", nullable = false)
     private Long variantId;
 
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+
     @Column(name = "sku", nullable = false, length = 50)
     private String sku;
-
-    @Column(name = "color", length = 50)
-    private String color;
-
-    @Column(name = "storage_capacity", length = 20)
-    private String storageCapacity;
 
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
@@ -39,10 +37,10 @@ public class ProductVariant {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
 }

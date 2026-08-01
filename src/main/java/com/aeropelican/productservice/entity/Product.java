@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Table(name = "products")
 @Entity
@@ -15,6 +13,8 @@ public class Product {
     @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
+    @Column(name = "category_id")
+    private Long categoryId;
     @Column(name = "product_name")
     private String productName;
     @Column(name = "description")
