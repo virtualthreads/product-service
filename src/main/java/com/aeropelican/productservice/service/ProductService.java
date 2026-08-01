@@ -44,12 +44,10 @@ public class ProductService {
     }
 
     public ProductResponseDTO getProduct(Integer productId) {
-        System.out.println("Attempting to fetch product with ID: " + productId);
         return productRepository.findById(productId)
                 .map(ProductMapper::toResponseDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Product is not found for provided ID: " + productId));
     }
-
 
     public ProductResponseDTO createProduct(ProductCreateRequestDTO request) {
 
@@ -65,8 +63,7 @@ public class ProductService {
                 );
 
         Product product = ProductMapper.toEntity(request);
-        //TODO: set category ID if present
-        //product.setCategoryId(request.getCategoryId());
+        product.setCategory(category); // Set category before saving
         return ProductMapper.toResponseDTO(productRepository.save(product));
     }
 
@@ -86,16 +83,22 @@ public class ProductService {
                         new ResourceNotFoundException("Category", String.valueOf(request.getCategoryId()))
                 );
 
-        //TODO: Set category ID if present
-        //product.setCategory(category);
         product.setProductName(productName);
         product.setDescription(request.getDescription());
         product.setBrand(request.getBrand());
+        product.setCategory(category); // Set updated category before saving
 
         if (request.getIsActive() != null) {
             product.setIsActive(request.getIsActive());
         }
 
         return ProductMapper.toResponseDTO(productRepository.save(product));
+    }
+
+    public void deleteProduct(Integer id) {
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product", String.valueOf(id));
+        }
+        productRepository.deleteById(id);
     }
 }

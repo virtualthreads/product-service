@@ -27,7 +27,6 @@ public class CategoryService {
         return categoryRepository.findById(catId)
                 .map(CategoryMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(catId)));
-
     }
 
     public PageResponse<CategoryResponseDTO> fetchAllCategories(int page, int size, String sortBy, String sortDir) {
@@ -45,8 +44,7 @@ public class CategoryService {
 
     public CategoryResponseDTO createCategory(CategoryRequestDTO request) throws BadRequestException {
 
-        if (!request.getCategoryName().equalsIgnoreCase(request.getCategoryName())
-                && categoryRepository.existsByCategoryNameIgnoreCase(request.getCategoryName())) {
+        if (categoryRepository.existsByCategoryNameIgnoreCase(request.getCategoryName().trim())) {
             throw new BadRequestException("Category already exists");
         } else if (request.getParentCategoryId() != null &&
                 !categoryRepository.existsById(request.getParentCategoryId())) {
@@ -91,5 +89,12 @@ public class CategoryService {
         }
 
         return CategoryMapper.toDTO(categoryRepository.save(category));
+    }
+
+    public void deleteCategory(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Category", String.valueOf(id));
+        }
+        categoryRepository.deleteById(id);
     }
 }
