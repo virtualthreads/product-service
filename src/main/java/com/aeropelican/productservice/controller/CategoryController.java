@@ -6,6 +6,8 @@ import com.aeropelican.productservice.dto.response.ApiResponse;
 import com.aeropelican.productservice.dto.response.CategoryResponse;
 import com.aeropelican.productservice.service.CategoryService;
 import com.aeropelican.productservice.service.ProductService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ public class CategoryController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@RequestBody CategoryRequest request) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@Valid @RequestBody CategoryRequest request) {
         CategoryResponse saved = categoryService.createCategory(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -30,7 +32,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategory(@Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId) {
         CategoryResponse category = categoryService.getCategory(categoryId);
         return ResponseEntity.ok(ApiResponse.success(category, "Category fetched"));
     }
@@ -42,27 +44,27 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}/children")
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getChildren(@PathVariable Long categoryId) {
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getChildren(@Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId) {
         List<CategoryResponse> results = categoryService.getChildren(categoryId);
         return ResponseEntity.ok(ApiResponse.success(results, "Child categories fetched"));
     }
 
     @GetMapping("/{categoryId}/products")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProductsByCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProductsByCategory(@Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId) {
         List<ProductResponse> results = productService.getProductsByCategory(categoryId);
         return ResponseEntity.ok(ApiResponse.success(results, "Products fetched by category"));
     }
 
     @PutMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
-            @PathVariable Long categoryId,
-            @RequestBody CategoryRequest request) {
+            @Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId,
+            @Valid @RequestBody CategoryRequest request) {
         CategoryResponse updated = categoryService.updateCategory(categoryId, request);
         return ResponseEntity.ok(ApiResponse.success(updated, "Category updated"));
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(@Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.ok(ApiResponse.success(null, "Category deleted"));
     }

@@ -3,6 +3,7 @@ package com.aeropelican.productservice.controller;
 import com.aeropelican.productservice.dto.response.ApiResponse;
 import com.aeropelican.productservice.dto.response.VariantAttributeResponse;
 import com.aeropelican.productservice.service.VariantAttributeService;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,9 @@ public class VariantAttributeController {
     private final VariantAttributeService variantAttributeService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<VariantAttributeResponse>>> getVariantAttributes(@PathVariable Long variantId) {
+    public ResponseEntity<ApiResponse<List<VariantAttributeResponse>>> getVariantAttributes(
+            @Positive(message = "Variant ID must be a positive number")
+            @PathVariable Long variantId) {
         return ResponseEntity.ok(ApiResponse.success(
                 variantAttributeService.fetchVariantAttributes(variantId),
                 "Variant attributes fetched"

@@ -5,6 +5,7 @@ import com.aeropelican.productservice.dto.response.ProductVariantResponse;
 import com.aeropelican.productservice.dto.response.ProductVariantResponseDTO;
 import com.aeropelican.productservice.repository.ProductVariantRepository;
 import com.aeropelican.productservice.service.ProductVariantService;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,9 @@ public class ProductVariantController {
     private final ProductVariantService productVariantService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductVariantResponse>>> getVariants(@PathVariable Long productId) {
+    public ResponseEntity<ApiResponse<List<ProductVariantResponse>>> getVariants(
+            @Positive(message = "Product ID must be a positive number")
+            @PathVariable Long productId) {
         return ResponseEntity.ok(ApiResponse.success(
                 productVariantService.getProductVariants(productId),
                 "Variants fetched"
@@ -30,7 +33,11 @@ public class ProductVariantController {
     }
 
     @GetMapping("/{variantId}")
-    public ResponseEntity<ApiResponse<ProductVariantResponse>> getVariant(@PathVariable Long productId, @PathVariable Long variantId) {
+    public ResponseEntity<ApiResponse<ProductVariantResponse>> getVariant(
+            @Positive(message = "Product ID must be a positive number")
+            @PathVariable Long productId,
+            @Positive(message = "Variant ID must be a positive number")
+            @PathVariable Long variantId) {
         return ResponseEntity.ok(ApiResponse.success(
                 productVariantService.getProductVariant(productId, variantId),
                 "Fetched Product Variant"
