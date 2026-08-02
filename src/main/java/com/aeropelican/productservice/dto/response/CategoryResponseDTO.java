@@ -13,6 +13,7 @@ public class CategoryResponseDTO {
     private String categoryName;
     private String description;
     private Category parentCategory;
+    @Builder.Default
     private Boolean isActive = true;
     private LocalDateTime createAt;
     private LocalDateTime updatedAt;

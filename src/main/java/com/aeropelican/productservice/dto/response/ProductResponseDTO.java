@@ -10,11 +10,18 @@ import java.time.LocalDateTime;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductResponseDTO {
+
     private Integer productId;
+
+    private Long categoryId;
+
     private String productName;
     private String description;
     private String brand;
+
+    @Builder.Default
     private Boolean isActive = true;
+
     private LocalDateTime createAt;
     private LocalDateTime updatedAt;
 }

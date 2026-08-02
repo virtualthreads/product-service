@@ -9,13 +9,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductCreateRequestDTO {
+public class ProductVariantsUpdateRequestDTO {
 
-    private Long categoryId;
-    private String productName;
-    private String description;
-    private String brand;
-
+    private Integer productId;
+    private String sku;
+    private String color;
+    private String storageCapacity;
+    private Double price;
     @Builder.Default
     private Boolean isActive = true;
+
 }
