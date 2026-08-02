@@ -1,9 +1,19 @@
 package com.aeropelican.productservice.service;
 
+<<<<<<< HEAD
 import com.aeropelican.productservice.dto.request.CategoryRequest;
 import com.aeropelican.productservice.dto.response.CategoryResponse;
+=======
+import com.aeropelican.productservice.dto.request.CategoryRequestDTO;
+import com.aeropelican.productservice.dto.request.PageRequestDTO;
+import com.aeropelican.productservice.dto.response.CategoryResponseDTO;
+import com.aeropelican.productservice.dto.response.PageResponse;
+>>>>>>> 47ca83c (Added Validations and changes  of Product,Category, Product_Variants,Product_Images API's.)
 import com.aeropelican.productservice.entity.Category;
+import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.exceptions.BadRequestException;
+import com.aeropelican.productservice.exceptions.CategoryNotFound;
+import com.aeropelican.productservice.exceptions.ProductNotFound;
 import com.aeropelican.productservice.exceptions.ResourceNotFoundException;
 import com.aeropelican.productservice.mapper.CategoryMapper;
 import com.aeropelican.productservice.repository.CategoryRepository;
@@ -32,6 +42,7 @@ public class CategoryService {
         return categoryMapper.toResponse(categoryRepository.save(category));
     }
 
+<<<<<<< HEAD
     public CategoryResponse getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .map(categoryMapper::toResponse)
@@ -42,12 +53,36 @@ public class CategoryService {
         return categoryRepository.findByParentCategoryIdIsNullAndIsActiveIsTrue()
                 .stream()
                 .map(categoryMapper::toResponse)
+=======
+    public PageResponse<CategoryResponseDTO> fetchAllCategories(PageRequestDTO requestDTO) {
+        Sort sort = requestDTO.getSortDir().equalsIgnoreCase("DESC")
+                            ? Sort.by(requestDTO.getSortBy()).descending()
+                             : Sort.by(requestDTO.getSortBy()).ascending();
+
+        Pageable pageable = PageRequest.of(requestDTO.getPage(),requestDTO.getSize(), sort);
+        Page<Category> pageResult = categoryRepository.findAll(pageable);
+
+        List<CategoryResponseDTO> content = pageResult.getContent()
+                .stream()
+                .map(CategoryMapper::toDTO)
+>>>>>>> 47ca83c (Added Validations and changes  of Product,Category, Product_Variants,Product_Images API's.)
                 .toList();
     }
+<<<<<<< HEAD
 
     public List<CategoryResponse> getChildren(Long categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
             throw new ResourceNotFoundException("Category", String.valueOf(categoryId));
+=======
+    public CategoryResponseDTO createCategory(CategoryRequestDTO request) throws BadRequestException {
+
+        if (!request.getCategoryName().equalsIgnoreCase(request.getCategoryName())
+                && categoryRepository.existsByCategoryNameIgnoreCase(request.getCategoryName())) {
+            throw new BadRequestException("Category already exists");
+        } else if (request.getParentCategoryId() != null &&
+                !categoryRepository.existsById(request.getParentCategoryId())) {
+            throw new BadRequestException("Parent category not found");
+>>>>>>> 47ca83c (Added Validations and changes  of Product,Category, Product_Variants,Product_Images API's.)
         }
         return categoryRepository.findByParentCategoryId(categoryId)
                 .stream()
@@ -78,4 +113,13 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryId));
         categoryRepository.delete(category);
     }
+    //To delete a product
+    public Category deleteCategory(long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFound("Category not found"));
+        categoryRepository.delete(category);
+        return category;
+    }
+
+
 }
