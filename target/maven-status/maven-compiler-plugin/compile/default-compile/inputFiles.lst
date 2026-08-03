@@ -2,6 +2,7 @@ C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\contr
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\controller\Product_ImagesController.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\controller\Product_VariantsController.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\controller\ProductController.java
+C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\controller\VariantAttributeController.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\request\CategoryRequestDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\request\CategoryUpdateRequestDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\request\PageRequestDTO.java
@@ -11,6 +12,8 @@ C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\r
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\request\ProductUpdateRequestDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\request\ProductVariantsCreateRequestDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\request\ProductVariantsUpdateRequestDTO.java
+C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\request\VariantAttributeCreateRequestDTO.java
+C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\request\VariantAttributeUpdateRequestDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\response\ApiResponse.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\response\CategoryResponseDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\response\ErrorResponse.java
@@ -19,10 +22,12 @@ C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\r
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\response\Product_imagesResponseDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\response\Product_VariantsResponseDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\response\ProductResponseDTO.java
+C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\dto\response\VariantAttributeResponseDTO.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\entity\Category.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\entity\Product.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\entity\Product_images.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\entity\Product_Variants.java
+C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\entity\VariantAttribute.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\exceptions\BadRequestException.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\exceptions\CategoryNotFound.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\exceptions\GlobalExceptionHandler.java
@@ -35,12 +40,15 @@ C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\mappe
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\mapper\Product_imagesMapper.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\mapper\Product_VariantsMapper.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\mapper\ProductMapper.java
+C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\mapper\VariantAttributeMapper.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\ProductServiceApplication.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\repository\CategoryRepository.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\repository\Product_imagesRespository.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\repository\Product_VariantsRepository.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\repository\ProductRepository.java
+C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\repository\VariantAttributeRepository.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\service\CategoryService.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\service\ProductService.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\service\ProductVariantService.java
+C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\service\VariantAttributeService.java
 C:\Users\DELL\product-service\src\main\java\com\aeropelican\productservice\ServletInitializer.java
