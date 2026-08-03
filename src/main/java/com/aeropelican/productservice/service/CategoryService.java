@@ -21,75 +21,99 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
+
     private final CategoryRepository categoryRepository;
 
-    public CategoryResponseDTO getCategory(Long catId) {
-        return categoryRepository.findById(catId)
-                .map(CategoryMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(catId)));
+    // ==========================================
+    // GET ALL CATEGORIES
+    // ==========================================
 
-    }
+    public PageResponse<CategoryResponseDTO> fetchAllCategories(
+            Integer page,
+            Integer size,
+            String sortBy,
+            String sortDir) {
 
-    public PageResponse<CategoryResponseDTO> fetchAllCategories(int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("DESC")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Category> pageResult = categoryRepository.findAll(pageable);
 
-        List<CategoryResponseDTO> content = pageResult.stream()
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+
+        List<CategoryResponseDTO> content = categoryPage.getContent()
+                .stream()
                 .map(CategoryMapper::toResponse)
                 .toList();
-        return PageResponseMapper.toPageResponse(pageResult, content);
+
+        return PageResponseMapper.toPageResponse(categoryPage, content);
     }
 
-    public CategoryResponseDTO createCategory(CategoryRequestDTO request) throws BadRequestException {
+    // ==========================================
+    // GET CATEGORY BY ID
+    // ==========================================
 
-        if (!request.getCategoryName().equalsIgnoreCase(request.getCategoryName())
-                && categoryRepository.existsByCategoryNameIgnoreCase(request.getCategoryName())) {
-            throw new BadRequestException("Category already exists");
-        } else if (request.getParentCategoryId() != null &&
-                !categoryRepository.existsById(request.getParentCategoryId())) {
-            throw new BadRequestException("Parent category not found");
+    public CategoryResponseDTO getCategory(Long categoryId) {
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id : " + categoryId));
+
+        return CategoryMapper.toResponse(category);
+    }
+
+    // ==========================================
+    // CREATE CATEGORY
+    // ==========================================
+
+    public CategoryResponseDTO createCategory(CategoryRequestDTO request) {
+
+        if (categoryRepository.existsByCategoryName(request.getCategoryName())) {
+            throw new BadRequestException("Category already exists.");
         }
 
         Category category = CategoryMapper.toEntity(request);
+
         category = categoryRepository.save(category);
 
         return CategoryMapper.toResponse(category);
     }
 
-    public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO request) {
+    // ==========================================
+    // UPDATE CATEGORY
+    // ==========================================
 
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(id)));
+    public CategoryResponseDTO updateCategory(
+            Long categoryId,
+            CategoryRequestDTO request) {
 
-        String categoryName = request.getCategoryName().trim();
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id : " + categoryId));
 
-        if (!category.getCategoryName().equalsIgnoreCase(categoryName)
-                && categoryRepository.existsByCategoryNameIgnoreCase(categoryName)) {
-            throw new BadRequestException("Category name already exists.");
-        }
-
-        if (request.getParentCategoryId() == null) {
-            category.setParentCategory(null);
-        } else {
-            if (request.getParentCategoryId().equals(id)) {
-                throw new BadRequestException("Category cannot be its own parent.");
-            }
-
-            Category parent = categoryRepository.findById(request.getParentCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Parent Category", String.valueOf(request.getParentCategoryId())));
-            category.setParentCategory(parent);
-        }
-
-        category.setCategoryName(categoryName);
+        category.setCategoryName(request.getCategoryName());
         category.setDescription(request.getDescription());
+        category.setIsActive(request.getActive());
 
-        if (request.getActive() != null) {
-            category.setIsActive(request.getActive());
-        }
+        category = categoryRepository.save(category);
 
-        return CategoryMapper.toResponse(categoryRepository.save(category));
+        return CategoryMapper.toResponse(category);
+    }
+
+    // ==========================================
+    // SEARCH CATEGORY
+    // ==========================================
+
+    public List<CategoryResponseDTO> searchCategories(String keyword) {
+
+        List<Category> categories = categoryRepository
+                .findByCategoryNameContainingIgnoreCase(keyword);
+
+        return categories.stream()
+                .map(CategoryMapper::toResponse)
+                .toList();
     }
 }
