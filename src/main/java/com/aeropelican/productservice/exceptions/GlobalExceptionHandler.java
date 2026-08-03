@@ -4,11 +4,10 @@ import com.aeropelican.productservice.dto.response.ErrorResponse;
 import com.aeropelican.productservice.dto.response.ApiResponse;
 import com.aeropelican.productservice.dto.response.FieldError;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.coyote.BadRequestException;
+//import org.apache.coyote.BadRequestException;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,10 +15,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
+import com.aeropelican.productservice.exceptions.BadRequestException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -77,27 +77,32 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidation(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
 
-        List<FieldError> fieldErrors =
-                ex.getBindingResult()
-                        .getFieldErrors()
-                        .stream()
-                        .map(error -> FieldError.builder()
-                                .field(error.getField())
-                                .rejectedValue(error.getRejectedValue())
-                                .message(error.getDefaultMessage())
-                                .build())
-                        .toList();
+        Map<String, String> errors = new HashMap<>();
 
-        ErrorResponse error = ErrorResponse.builder()
+        ex.getBindingResult().getFieldErrors()
+                .forEach(error ->
+                        errors.put(error.getField(), error.getDefaultMessage()));
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode("VALIDATION_FAILED")
                 .status(HttpStatus.BAD_REQUEST.value())
                 .path(request.getRequestURI())
-                .fieldErrors(fieldErrors)
                 .build();
 
-        return build(HttpStatus.BAD_REQUEST, error, "Validation failed");
+        return ResponseEntity.badRequest()
+                .body(
+                        ApiResponse.<Map<String, String>>builder()
+                                .success(false)
+                                .message("Validation failed")
+                                .data(errors)
+                                .error(errorResponse)
+                                .timestamp(LocalDateTime.now())
+                                .build()
+                );
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -126,14 +131,12 @@ public class GlobalExceptionHandler {
                                     .build()
                             );
                 }).toList();
-
         ErrorResponse error = ErrorResponse.builder()
-                .errorCode("ROUTE_NOT_FOUND")
-                .status(HttpStatus.NOT_FOUND.value())
+                .errorCode("VALIDATION_FAILED")
+                .status(HttpStatus.BAD_REQUEST.value())
                 .path(request.getRequestURI())
                 .fieldErrors(errors)
                 .build();
-
         return build(HttpStatus.BAD_REQUEST, error, "Validation failed");
     }
 

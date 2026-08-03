@@ -4,29 +4,29 @@ import com.aeropelican.productservice.dto.request.CategoryRequestDTO;
 import com.aeropelican.productservice.dto.response.CategoryResponseDTO;
 import com.aeropelican.productservice.entity.Category;
 
-import java.time.LocalDateTime;
-
 public class CategoryMapper {
 
-    public static CategoryResponseDTO toDTO(Category category) {
+    public static CategoryResponseDTO toResponseDTO(Category category) {
+
         return CategoryResponseDTO.builder()
                 .categoryId(category.getCategoryId())
                 .categoryName(category.getCategoryName())
+                .description(category.getDescription())
                 .parentCategory(category.getParentCategory())
                 .isActive(category.getIsActive())
-                .description(category.getDescription())
-                .createAt(category.getCreateAt())
+                .createAt(category.getCreatedAt())
                 .updatedAt(category.getUpdatedAt())
                 .build();
     }
 
-    public static Category toEntity(CategoryRequestDTO requestDTO) {
+    public static Category toEntity(CategoryRequestDTO request) {
+
         Category category = new Category();
-        category.setCategoryName(requestDTO.getCategoryName());
-        category.setDescription(requestDTO.getDescription());
+
+        category.setCategoryName(request.getCategoryName());
+        category.setDescription(request.getDescription());
         category.setIsActive(true);
-        category.setCreateAt(LocalDateTime.now());
-        category.setUpdatedAt(LocalDateTime.now());
+
         return category;
     }
 }

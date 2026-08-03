@@ -3,36 +3,39 @@ package com.aeropelican.productservice.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "products")
+@Table(name = "product_variants")
 @Data
-public class Product {
+public class ProductVariants {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "variant_id")
+    private Integer variantId;
+
     @Column(name = "product_id")
     private Integer productId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @Column(name = "sku")
+    private String sku;
 
-    @Column(name = "product_name")
-    private String productName;
+    @Column(name = "color")
+    private String color;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "storage_capacity")
+    private String storageCapacity;
 
-    @Column(name = "brand")
-    private String brand;
+    @Column(name = "price")
+    private BigDecimal price;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
 
     @Column(name = "created_at")
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

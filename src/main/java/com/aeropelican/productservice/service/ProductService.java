@@ -1,5 +1,6 @@
 package com.aeropelican.productservice.service;
 
+import com.aeropelican.productservice.dto.request.PageRequestDTO;
 import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
 import com.aeropelican.productservice.dto.request.ProductUpdateRequestDTO;
 import com.aeropelican.productservice.dto.response.PageResponse;
@@ -7,16 +8,14 @@ import com.aeropelican.productservice.dto.response.ProductResponseDTO;
 import com.aeropelican.productservice.entity.Category;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.exceptions.BadRequestException;
+import com.aeropelican.productservice.exceptions.ProductNotFound;
 import com.aeropelican.productservice.exceptions.ResourceNotFoundException;
 import com.aeropelican.productservice.mapper.PageResponseMapper;
 import com.aeropelican.productservice.mapper.ProductMapper;
 import com.aeropelican.productservice.repository.CategoryRepository;
 import com.aeropelican.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,26 +27,39 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
-    public PageResponse<ProductResponseDTO> listProducts(int page, int size, String sortBy, String sortDirection) {
 
-        Sort sort = sortDirection.equalsIgnoreCase("DESC")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+    public PageResponse<ProductResponseDTO> listProducts(PageRequestDTO requestDTO) {
 
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Product> pageResult = productRepository.findAll(pageable);
+        Sort sort = requestDTO.getSortDir().equalsIgnoreCase("DESC")
+                ? Sort.by(requestDTO.getSortBy()).descending()
+                : Sort.by(requestDTO.getSortBy()).ascending();
 
-        List<ProductResponseDTO> content = pageResult.stream()
+        Pageable pageable = PageRequest.of(
+                requestDTO.getPage(),
+                requestDTO.getSize(),
+                sort
+        );
+
+        Page<Product> page = productRepository.findAll(pageable);
+
+        List<ProductResponseDTO> products = page.getContent()
+                .stream()
                 .map(ProductMapper::toResponseDTO)
                 .toList();
-        return PageResponseMapper.toPageResponse(pageResult, content);
+
+        return PageResponseMapper.toPageResponse(page, products);
     }
 
+
     public ProductResponseDTO getProduct(Integer productId) {
-        System.out.println("Attempting to fetch product with ID: " + productId);
-        return productRepository.findById(productId)
-                .map(ProductMapper::toResponseDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Product is not found for provided ID: " + productId));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product",
+                                String.valueOf(productId)));
+
+        return ProductMapper.toResponseDTO(product);
     }
 
 
@@ -60,34 +72,48 @@ public class ProductService {
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Category", String.valueOf(request.getCategoryId()))
-                );
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category",
+                                String.valueOf(request.getCategoryId())));
 
         Product product = ProductMapper.toEntity(request);
-        //TODO: set category ID if present
-        //product.setCategoryId(request.getCategoryId());
-        return ProductMapper.toResponseDTO(productRepository.save(product));
+
+        // IMPORTANT
+        product.setCategory(category);
+
+        Product savedProduct = productRepository.save(product);
+
+        return ProductMapper.toResponseDTO(savedProduct);
     }
 
-    public ProductResponseDTO updateProduct(Integer id, ProductUpdateRequestDTO request) {
 
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", String.valueOf(id)));
+    public ProductResponseDTO updateProduct(
+            Integer productId,
+            ProductUpdateRequestDTO request) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product",
+                                String.valueOf(productId)));
 
         String productName = request.getProductName().trim();
 
-        if (productRepository.existsByProductNameIgnoreCaseAndProductIdNot(productName, id)) {
+        if (productRepository.existsByProductNameIgnoreCaseAndProductIdNot(
+                productName,
+                productId)) {
+
             throw new BadRequestException("Product name already exists.");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Category", String.valueOf(request.getCategoryId()))
-                );
+                        new ResourceNotFoundException(
+                                "Category",
+                                String.valueOf(request.getCategoryId())));
 
-        //TODO: Set category ID if present
-        //product.setCategory(category);
+        product.setCategory(category);
         product.setProductName(productName);
         product.setDescription(request.getDescription());
         product.setBrand(request.getBrand());
@@ -96,6 +122,20 @@ public class ProductService {
             product.setIsActive(request.getIsActive());
         }
 
-        return ProductMapper.toResponseDTO(productRepository.save(product));
+        Product updatedProduct = productRepository.save(product);
+
+        return ProductMapper.toResponseDTO(updatedProduct);
+    }
+
+
+    public Product deleteProduct(Integer productId) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ProductNotFound("Product not found"));
+
+        productRepository.delete(product);
+
+        return product;
     }
 }

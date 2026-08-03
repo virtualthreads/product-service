@@ -23,7 +23,7 @@ public class Category {
     @Column(name = "is_active")
     private Boolean isActive = true;
     @Column(name = "created_at")
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+private LocalDateTime updatedAt;
 }
