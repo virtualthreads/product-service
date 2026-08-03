@@ -1,18 +1,22 @@
 package com.aeropelican.productservice.mapper;
 
 import com.aeropelican.productservice.dto.request.ProductRequest;
-import com.aeropelican.productservice.dto.request.ProductResponse;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Product;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class ProductMapper {
+
+    private final ProductVariantMapper productVariantMapper;
 
     public Product toEntity(ProductRequest request) {
         Product product = new Product();
-        product.setCategoryId(request.categoryId());
+        //product.setCategoryId(request.categoryId());
         product.setProductName(request.productName());
         product.setDescription(request.description());
         product.setBrand(request.brand());
@@ -22,15 +26,31 @@ public class ProductMapper {
     }
 
     public ProductResponse toResponse(Product product) {
-        return new ProductResponse(
-                product.getProductId(),
-                product.getCategoryId(),
-                product.getProductName(),
-                product.getDescription(),
-                product.getBrand(),
-                product.getIsActive(),
-                product.getCreateAt(),
-                product.getUpdatedAt()
-        );
+        return ProductResponse.builder()
+                .productId(product.getProductId())
+                .productName(product.getProductName())
+                .description(product.getDescription())
+                .brand(product.getBrand())
+                .isActive(product.getIsActive())
+                .createdAt(product.getCreateAt())
+                .updatedAt(product.getUpdatedAt())
+                .build();
+    }
+
+    public ProductResponse toResponseWithVariants(Product product) {
+        return ProductResponse.builder()
+                .productId(product.getProductId())
+                .productName(product.getProductName())
+                .description(product.getDescription())
+                .brand(product.getBrand())
+                .isActive(product.getIsActive())
+                .createdAt(product.getCreateAt())
+                .updatedAt(product.getUpdatedAt())
+                .variants(product.getVariants()
+                        .stream()
+                        .map(productVariantMapper::toResponse)
+                        .toList()
+                )
+                .build();
     }
 }

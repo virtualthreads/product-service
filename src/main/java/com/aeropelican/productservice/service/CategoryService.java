@@ -34,7 +34,7 @@ public class CategoryService {
 
     public CategoryResponse getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .map(categoryMapper::toResponse)
+                .map(categoryMapper::toResponseWithProducts)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(categoryId)));
     }
 

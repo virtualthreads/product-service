@@ -14,8 +14,8 @@
 -- product_id) — that's the actual sellable unit.
 -- =====================================================================
 
-CREATE DATABASE IF NOT EXISTS product_service_db;
-USE product_service_db;
+CREATE DATABASE IF NOT EXISTS ecom_product;
+USE ecom_product;
 
 DROP TABLE IF EXISTS product_images;
 DROP TABLE IF EXISTS product_variants;

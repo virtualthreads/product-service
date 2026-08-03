@@ -1,9 +1,9 @@
 package com.aeropelican.productservice.controller;
 
 import com.aeropelican.productservice.dto.request.CategoryRequest;
-import com.aeropelican.productservice.dto.request.ProductResponse;
 import com.aeropelican.productservice.dto.response.ApiResponse;
 import com.aeropelican.productservice.dto.response.CategoryResponse;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.service.CategoryService;
 import com.aeropelican.productservice.service.ProductService;
 import jakarta.validation.Valid;

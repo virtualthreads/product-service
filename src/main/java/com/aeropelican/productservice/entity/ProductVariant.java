@@ -22,9 +22,6 @@ public class ProductVariant {
     @Column(name = "variant_id", nullable = false)
     private Long variantId;
 
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
-
     @Column(name = "sku", nullable = false, length = 50)
     private String sku;
 
@@ -43,4 +40,7 @@ public class ProductVariant {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 }

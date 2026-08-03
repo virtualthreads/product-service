@@ -1,8 +1,8 @@
 package com.aeropelican.productservice.controller;
 
 import com.aeropelican.productservice.dto.request.ProductRequest;
-import com.aeropelican.productservice.dto.request.ProductResponse;
 import com.aeropelican.productservice.dto.response.ApiResponse;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.service.ProductService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

@@ -16,7 +16,6 @@ public class ProductVariantMapper {
     public ProductVariant toEntity(ProductVariantRequest request) {
         LocalDateTime now = LocalDateTime.now();
         return ProductVariant.builder()
-                .productId(request.productId())
                 .sku(request.sku())
                 .price(request.price())
                 .isActive(request.isActive() != null ? request.isActive() : true)

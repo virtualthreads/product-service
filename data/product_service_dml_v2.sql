@@ -4,7 +4,7 @@
 -- iPhone 16 Pro demonstrates multi-color / multi-storage variants
 -- =====================================================================
 
-USE product_service_db;
+USE ecom_product;
 
 -- ---------------------------------------------------------------------
 -- categories (33 rows)

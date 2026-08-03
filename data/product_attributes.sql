@@ -1,3 +1,6 @@
+
+USE ecom_product;
+
 CREATE TABLE variant_attributes (
                                     variant_attribute_id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                     variant_id   BIGINT NOT NULL,

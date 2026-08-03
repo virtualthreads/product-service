@@ -37,4 +37,7 @@ public class Category {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "category")
+    private List<Product> products = new ArrayList<>();
 }

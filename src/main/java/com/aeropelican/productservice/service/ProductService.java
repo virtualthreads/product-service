@@ -1,7 +1,7 @@
 package com.aeropelican.productservice.service;
 
 import com.aeropelican.productservice.dto.request.ProductRequest;
-import com.aeropelican.productservice.dto.request.ProductResponse;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.exceptions.BadRequestException;
 import com.aeropelican.productservice.exceptions.ResourceNotFoundException;
@@ -34,7 +34,7 @@ public class ProductService {
 
     public ProductResponse getProduct(Long productId) {
         return productRepository.findById(productId)
-                .map(productMapper::toResponse)
+                .map(productMapper::toResponseWithVariants)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", String.valueOf(productId)));
     }
 
@@ -42,7 +42,7 @@ public class ProductService {
         if (!categoryRepository.existsById(categoryId)) {
             throw new ResourceNotFoundException("Category", String.valueOf(categoryId));
         }
-        return productRepository.findByCategoryId(categoryId)
+        return productRepository.findByCategory_categoryId(categoryId)
                 .stream()
                 .map(productMapper::toResponse)
                 .toList();

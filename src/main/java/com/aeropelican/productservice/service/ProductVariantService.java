@@ -22,7 +22,7 @@ public class ProductVariantService {
     public List<ProductVariantResponse> getProductVariants(Long productId) {
         productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", String.valueOf(productId)));
-        List<ProductVariant> variants = productVariantRepository.findByProductId(productId);
+        List<ProductVariant> variants = productVariantRepository.findByProduct_ProductId(productId);
         return variants.stream()
                 .map(productVariantMapper::toResponse)
                 .toList();
@@ -33,7 +33,7 @@ public class ProductVariantService {
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Product", "ProductId", String.valueOf(productId))
                 );
-        return productVariantRepository.findByProductIdAndVariantId(productId, variantId)
+        return productVariantRepository.findByProduct_ProductIdAndVariantId( productId, variantId)
                 .map(productVariantMapper::toResponse)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Product Variant", "VariantId", String.valueOf(variantId))
