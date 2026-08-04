@@ -1,6 +1,7 @@
 package com.aeropelican.productservice.service;
 
 import com.aeropelican.productservice.dto.request.ProductRequest;
+import com.aeropelican.productservice.dto.request.ProductSearchRequest;
 import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.exceptions.BadRequestException;
@@ -59,5 +60,18 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", String.valueOf(productId)));
         productRepository.delete(product);
+    }
+
+    public List<ProductResponse> searchProducts(ProductSearchRequest request) {
+        return productRepository.searchProduct(
+                request.keyword(),
+                request.brand(),
+                request.color(),
+                request.minPrice(),
+                request.maxPrice()
+        )
+                .stream()
+                .map(productMapper::toResponseWithVariants)
+                .toList();
     }
 }
