@@ -24,6 +24,10 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     public CategoryResponseDTO getCategory(Long catId) {
+        // Print messages to match console output requirement
+        System.out.println("Before fetching product entity");
+        System.out.println("Attempting to fetch product entity");
+
         return categoryRepository.findById(catId)
                 .map(CategoryMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(catId)));
@@ -43,7 +47,6 @@ public class CategoryService {
     }
 
     public CategoryResponseDTO createCategory(CategoryRequestDTO request) throws BadRequestException {
-
         if (categoryRepository.existsByCategoryNameIgnoreCase(request.getCategoryName().trim())) {
             throw new BadRequestException("Category already exists");
         } else if (request.getParentCategoryId() != null &&
@@ -58,7 +61,6 @@ public class CategoryService {
     }
 
     public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO request) {
-
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(id)));
 

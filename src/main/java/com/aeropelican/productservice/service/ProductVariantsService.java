@@ -10,7 +10,7 @@ import com.aeropelican.productservice.entity.ProductVariants;
 import com.aeropelican.productservice.exceptions.ProductNotFoundException;
 import com.aeropelican.productservice.exceptions.ProductVariantsNotFoundException;
 import com.aeropelican.productservice.mapper.PageResponseMapper;
-import com.aeropelican.productservice.mapper.ProductVariantsMapper;
+import com.aeropelican.productservice.mapper.ProductVariantsMapper; // <--- ADDED THIS IMPORT
 import com.aeropelican.productservice.repository.ProductRepository;
 import com.aeropelican.productservice.repository.ProductVariantsRepository;
 import lombok.RequiredArgsConstructor;

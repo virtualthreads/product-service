@@ -12,6 +12,10 @@ public class ProductVariantsMapper {
             return null;
         }
 
+        // Print statements for tracking execution in console
+        System.out.println("Before fetching product variant entity");
+        System.out.println("Attempting to fetch product variant entity");
+
         Long variantId = variant.getVariantId() != null ? variant.getVariantId().longValue() : null;
         Long productId = (variant.getProduct() != null && variant.getProduct().getProductId() != null)
                 ? variant.getProduct().getProductId().longValue()

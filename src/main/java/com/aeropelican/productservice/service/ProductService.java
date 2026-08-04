@@ -29,7 +29,6 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     public PageResponse<ProductResponseDTO> listProducts(int page, int size, String sortBy, String sortDirection) {
-
         Sort sort = sortDirection.equalsIgnoreCase("DESC")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
@@ -44,13 +43,16 @@ public class ProductService {
     }
 
     public ProductResponseDTO getProduct(Integer productId) {
+        // Print messages to match console output requirement
+        System.out.println("Before fetching product entity");
+        System.out.println("Attempting to fetch product entity");
+
         return productRepository.findById(productId)
                 .map(ProductMapper::toResponseDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Product is not found for provided ID: " + productId));
     }
 
     public ProductResponseDTO createProduct(ProductCreateRequestDTO request) {
-
         String productName = request.getProductName().trim();
 
         if (productRepository.existsByProductNameIgnoreCase(productName)) {
@@ -63,12 +65,11 @@ public class ProductService {
                 );
 
         Product product = ProductMapper.toEntity(request);
-        product.setCategory(category); // Set category before saving
+        product.setCategory(category);
         return ProductMapper.toResponseDTO(productRepository.save(product));
     }
 
     public ProductResponseDTO updateProduct(Integer id, ProductUpdateRequestDTO request) {
-
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", String.valueOf(id)));
 
@@ -86,7 +87,7 @@ public class ProductService {
         product.setProductName(productName);
         product.setDescription(request.getDescription());
         product.setBrand(request.getBrand());
-        product.setCategory(category); // Set updated category before saving
+        product.setCategory(category);
 
         if (request.getIsActive() != null) {
             product.setIsActive(request.getIsActive());

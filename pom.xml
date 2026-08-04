@@ -15,7 +15,7 @@
     <groupId>com.aeropelican</groupId>
     <artifactId>product-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>product-service</name>
     <description>product-service</description>

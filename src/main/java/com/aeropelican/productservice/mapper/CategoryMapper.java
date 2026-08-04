@@ -4,29 +4,35 @@ import com.aeropelican.productservice.dto.request.CategoryRequestDTO;
 import com.aeropelican.productservice.dto.response.CategoryResponseDTO;
 import com.aeropelican.productservice.entity.Category;
 
-import java.time.LocalDateTime;
-
 public class CategoryMapper {
 
-    public static CategoryResponseDTO toDTO(Category category) {
-        return CategoryResponseDTO.builder()
-                .categoryId(category.getCategoryId())
-                .categoryName(category.getCategoryName())
-                .parentCategory(category.getParentCategory())
-                .isActive(category.getIsActive())
-                .description(category.getDescription())
-                .createAt(category.getCreateAt())
-                .updatedAt(category.getUpdatedAt())
+    public static Category toEntity(CategoryRequestDTO request) {
+        if (request == null) {
+            return null;
+        }
+        return Category.builder()
+                .categoryName(request.getCategoryName())
+                .description(request.getDescription())
+                .isActive(request.getActive() != null ? request.getActive() : true)
                 .build();
     }
 
-    public static Category toEntity(CategoryRequestDTO requestDTO) {
-        Category category = new Category();
-        category.setCategoryName(requestDTO.getCategoryName());
-        category.setDescription(requestDTO.getDescription());
-        category.setIsActive(true);
-        category.setCreateAt(LocalDateTime.now());
-        category.setUpdatedAt(LocalDateTime.now());
-        return category;
+    public static CategoryResponseDTO toDTO(Category category) {
+        if (category == null) {
+            return null;
+        }
+
+        // THESE TWO LINES ARE WHAT PRINT THE MESSAGES TO THE CONSOLE:
+        System.out.println("Before fetching product entity");
+        System.out.println("Attempting to fetch product entity");
+
+        return CategoryResponseDTO.builder()
+                .categoryId(category.getCategoryId())
+                .categoryName(category.getCategoryName())
+                .description(category.getDescription())
+                .isActive(category.getIsActive())
+                .createAt(category.getCreateAt())
+                .updatedAt(category.getUpdatedAt())
+                .build();
     }
 }
