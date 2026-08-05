@@ -8,6 +8,7 @@ import com.aeropelican.productservice.exceptions.ResourceNotFoundException;
 import com.aeropelican.productservice.mapper.CategoryMapper;
 import com.aeropelican.productservice.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,18 +17,24 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+        log.debug("Attempting to create a category: {}", categoryRequest.categoryName());
+
         if (categoryRepository.existsByCategoryNameIgnoreCase(categoryRequest.categoryName())) {
+            log.error("Category {} is already exist. Cannot process the request", categoryRequest.categoryName());
             throw new BadRequestException("Category '%s' already exist".formatted(categoryRequest.categoryName()));
         }
-        if (categoryRequest.parentCategoryId() != null && categoryRepository.existsById(categoryRequest.parentCategoryId())) {
+        if (categoryRequest.parentCategoryId() != null && !categoryRepository.existsById(categoryRequest.parentCategoryId())) {
+            log.error("Parent category not found with provided parent_category_id: {}. Cannot process the request", categoryRequest.categoryName());
             throw new ResourceNotFoundException("Category", String.valueOf(categoryRequest.parentCategoryId()));
         }
+        log.info("Create category request is accepted. Proceeding to create category");
         Category category = categoryMapper.toEntity(categoryRequest);
         return categoryMapper.toResponse(categoryRepository.save(category));
     }

@@ -9,6 +9,7 @@ import com.aeropelican.productservice.service.ProductService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
+@Slf4j
+/**
+ * info
+ * debug
+ * warn
+ * error
+ */
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -25,6 +33,8 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@Valid @RequestBody CategoryRequest request) {
+        log.info("Received a request to create a category: {}", request.categoryName());
+
         CategoryResponse saved = categoryService.createCategory(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
