@@ -10,12 +10,15 @@ import com.aeropelican.productservice.mapper.ProductMapper;
 import com.aeropelican.productservice.repository.CategoryRepository;
 import com.aeropelican.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -33,12 +36,14 @@ public class ProductService {
         return productMapper.toResponse(productRepository.save(product));
     }
 
+    @Cacheable(value = "Get-product-details", key = "#productId")
     public ProductResponse getProduct(Long productId) {
         return productRepository.findById(productId)
                 .map(productMapper::toResponseWithVariants)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", String.valueOf(productId)));
     }
 
+    @Cacheable(value = "Get-product-using-category", key = "#categoryId")
     public List<ProductResponse> getProductsByCategory(Long categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
             throw new ResourceNotFoundException("Category", String.valueOf(categoryId));
@@ -62,14 +67,20 @@ public class ProductService {
         productRepository.delete(product);
     }
 
+    @Cacheable(value = "product-search", key = "#request")
     public List<ProductResponse> searchProducts(ProductSearchRequest request) {
-        return productRepository.searchProduct(
+        log.info("Attempting to fetch products from database");
+
+        List<Product> result = productRepository.searchProduct(
                 request.keyword(),
                 request.brand(),
                 request.color(),
                 request.minPrice(),
                 request.maxPrice()
-        )
+        );
+
+        log.info("Completed fetching data from the database");
+        return result
                 .stream()
                 .map(productMapper::toResponseWithVariants)
                 .toList();
