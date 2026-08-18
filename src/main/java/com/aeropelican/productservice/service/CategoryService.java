@@ -40,36 +40,55 @@ public class CategoryService {
     }
 
     public CategoryResponse getCategory(Long categoryId) {
-        return categoryRepository.findById(categoryId)
+        log.debug("Fetching category with ID: {}", categoryId);
+        CategoryResponse response = categoryRepository.findById(categoryId)
                 .map(categoryMapper::toResponseWithProducts)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(categoryId)));
+                .orElseThrow(() -> {
+                    log.error("Category not found with ID: {}", categoryId);
+                    return new ResourceNotFoundException("Category", String.valueOf(categoryId));
+                });
+        log.info("Successfully retrieved category with ID: {}", categoryId);
+        return response;
     }
 
     public List<CategoryResponse> getParentCategories() {
-        return categoryRepository.findByParentCategoryIdIsNullAndIsActiveIsTrue()
+        log.debug("Fetching all parent categories");
+        List<CategoryResponse> results = categoryRepository.findByParentCategoryIdIsNullAndIsActiveIsTrue()
                 .stream()
                 .map(categoryMapper::toResponse)
                 .toList();
+        log.info("Successfully fetched {} parent categories", results.size());
+        return results;
     }
 
     public List<CategoryResponse> getChildren(Long categoryId) {
+        log.debug("Fetching child categories for parent ID: {}", categoryId);
         if (!categoryRepository.existsById(categoryId)) {
+            log.error("Parent category not found with ID: {}", categoryId);
             throw new ResourceNotFoundException("Category", String.valueOf(categoryId));
         }
-        return categoryRepository.findByParentCategoryId(categoryId)
+        List<CategoryResponse> results = categoryRepository.findByParentCategoryId(categoryId)
                 .stream()
                 .map(categoryMapper::toResponse)
                 .toList();
+        log.info("Successfully fetched {} child categories for parent ID: {}", results.size(), categoryId);
+        return results;
     }
 
     public CategoryResponse updateCategory(Long categoryId, CategoryRequest request) {
-
+        log.info("Attempting to update category ID: {} with name: {}", categoryId, request.categoryName());
+        
         Category existingCategory = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", String.valueOf(categoryId)));
+                .orElseThrow(() -> {
+                    log.error("Category not found with ID: {} for update", categoryId);
+                    return new ResourceNotFoundException("Category", String.valueOf(categoryId));
+                });
         if (request.parentCategoryId() != null && !categoryRepository.existsById(request.parentCategoryId())) {
+            log.error("Parent category not found with ID: {}", request.parentCategoryId());
             throw new ResourceNotFoundException("Parent category", String.valueOf(request.parentCategoryId()));
         }
         if (request.categoryName() != null && categoryRepository.existsByCategoryNameIgnoreCase(request.categoryName())) {
+            log.warn("Category with name {} already exists. Cannot update category ID: {}", request.categoryName(), categoryId);
             throw new BadRequestException("Category is already present");
         }
 
@@ -77,12 +96,19 @@ public class CategoryService {
         existingCategory.setDescription(request.description());
         existingCategory.setUpdatedAt(LocalDateTime.now());
 
-        return categoryMapper.toResponse(categoryRepository.save(existingCategory));
+        CategoryResponse response = categoryMapper.toResponse(categoryRepository.save(existingCategory));
+        log.info("Successfully updated category ID: {}", categoryId);
+        return response;
     }
 
     public void deleteCategory(Long categoryId) {
+        log.info("Attempting to delete category ID: {}", categoryId);
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + categoryId));
+                .orElseThrow(() -> {
+                    log.error("Category not found with ID: {} for deletion", categoryId);
+                    return new ResourceNotFoundException("Category not found: " + categoryId);
+                });
         categoryRepository.delete(category);
+        log.info("Successfully deleted category ID: {}", categoryId);
     }
 }

@@ -24,12 +24,10 @@ public class ProductSearchController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<List<ProductResponse>>> searchProducts(@RequestBody ProductSearchRequest request) {
-        log.info("Received a request to search for the products using keyword: {}", request.keyword());
-        long startTime = System.nanoTime();
+        log.info("Received a request to search for products using keyword: {}", request.keyword());
+        log.debug("Search parameters - Brand: {}, Color: {}, Price range: {} to {}", 
+                request.brand(), request.color(), request.minPrice(), request.maxPrice());
         List<ProductResponse> results = productService.searchProducts(request);
-        long endTime = System.nanoTime();
-        long totalExecutionTime = endTime - startTime;
-        log.info("Total execution time: {}", totalExecutionTime/1000000.0);
         return ResponseEntity.ok(ApiResponse.success(results, "Products fetched successfully"));
     }
 }
