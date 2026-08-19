@@ -2,38 +2,36 @@ package com.aeropelican.productservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "users")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Category {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
-    private Long categoryId;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @Column(name = "category_name", nullable = false)
-    private String categoryName;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
 
-    private String description;
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_category_id")
-    private Category parentCategory;
+    @Column(name = "password", nullable = false)
+    private String password;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Product> products = new ArrayList<>();
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "created_at")
     private LocalDateTime createAt;
@@ -43,6 +41,7 @@ public class Category {
 
     @PrePersist
     protected void onCreate() {
+        this.status = (this.status == null) ? "ACTIVE" : this.status;
         this.createAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

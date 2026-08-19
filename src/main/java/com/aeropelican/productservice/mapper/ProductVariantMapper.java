@@ -1,37 +1,35 @@
 package com.aeropelican.productservice.mapper;
 
-import com.aeropelican.productservice.dto.request.ProductVariantRequest;
-import com.aeropelican.productservice.dto.response.ProductVariantResponse;
-import com.aeropelican.productservice.dto.response.ProductVariantResponseDTO;
-import com.aeropelican.productservice.entity.ProductVariant;
-import org.springframework.stereotype.Component;
+import com.aeropelican.productservice.dto.response.ProductVariantsResponseDTO;
+import com.aeropelican.productservice.entity.ProductVariants;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
-@Component
-public class ProductVariantMapper {
+public class ProductVariantsMapper {
 
-    public ProductVariant toEntity(ProductVariantRequest request) {
-        LocalDateTime now = LocalDateTime.now();
-        return ProductVariant.builder()
-                .sku(request.sku())
-                .price(request.price())
-                .isActive(request.isActive() != null ? request.isActive() : true)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-    }
+    public static ProductVariantsResponseDTO toProductVariantsResponse(ProductVariants variant) {
+        if (variant == null) {
+            return null;
+        }
 
-    public ProductVariantResponse toResponse(ProductVariant variant) {
-        return ProductVariantResponse.builder()
-                .variantId(variant.getVariantId())
-                .sku(variant.getSku())
-                .price(variant.getPrice())
-                .isActive(variant.getIsActive())
-                .createdAt(variant.getCreatedAt())
-                .updatedAt(variant.getUpdatedAt())
+        // Print statements for tracking execution in console
+        System.out.println("Before fetching product variant entity");
+        System.out.println("Attempting to fetch product variant entity");
+
+        Long variantId = variant.getVariantId() != null ? variant.getVariantId().longValue() : null;
+        Long productId = (variant.getProduct() != null && variant.getProduct().getProductId() != null)
+                ? variant.getProduct().getProductId().longValue()
+                : null;
+
+        BigDecimal price = variant.getPrice() != null ? BigDecimal.valueOf(variant.getPrice()) : null;
+
+        return ProductVariantsResponseDTO.builder()
+                .variantId(variantId)
+                .productId(productId)
+                .variantName(variant.getVariantName())
+                .color(variant.getColor())
+                .size(variant.getSize())
+                .price(price)
                 .build();
     }
 }

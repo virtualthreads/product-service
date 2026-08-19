@@ -1,87 +1,92 @@
 package com.aeropelican.productservice.controller;
 
-import com.aeropelican.productservice.dto.request.CategoryRequest;
+import com.aeropelican.productservice.dto.request.CategoryRequestDTO;
 import com.aeropelican.productservice.dto.response.ApiResponse;
-import com.aeropelican.productservice.dto.response.CategoryResponse;
-import com.aeropelican.productservice.dto.response.ProductResponse;
+import com.aeropelican.productservice.dto.response.CategoryResponseDTO;
+import com.aeropelican.productservice.dto.response.PageResponse;
 import com.aeropelican.productservice.service.CategoryService;
-import com.aeropelican.productservice.service.ProductService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-@RequiredArgsConstructor
-@Slf4j
+@Validated
 public class CategoryController {
 
-    private final CategoryService categoryService;
-    private final ProductService productService;
+    @Autowired
+    private CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@Valid @RequestBody CategoryRequest request) {
-        log.info("Received a request to create a category: {}", request.categoryName());
-
-        CategoryResponse saved = categoryService.createCategory(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(saved, "Category created"));
+    public ResponseEntity<ApiResponse<CategoryResponseDTO>> createCategory(@Valid @RequestBody CategoryRequestDTO request) {
+        return new ResponseEntity<>(
+                ApiResponse.success(categoryService.createCategory(request), "Category created successfully"),
+                HttpStatus.CREATED
+        );
     }
 
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> getCategory(@Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId) {
-        log.debug("Fetching category with ID: {}", categoryId);
-        CategoryResponse category = categoryService.getCategory(categoryId);
-        log.info("Successfully fetched category with ID: {}", categoryId);
-        return ResponseEntity.ok(ApiResponse.success(category, "Category fetched"));
+    // URL: GET /api/v1/categories/0/10
+    @GetMapping("/{page}/{size}")
+    public ResponseEntity<ApiResponse<PageResponse<CategoryResponseDTO>>> getAllCategories(
+            @PathVariable @Min(value = 0, message = "Page index must be zero or positive") int page,
+            @PathVariable @Positive(message = "Page size must be greater than zero") int size) {
+        return ResponseEntity.ok(
+                ApiResponse.success(categoryService.fetchAllCategories(page, size, "categoryId", "ASC"), "Categories fetched successfully")
+        );
     }
 
-    @GetMapping("/parents")
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getParentCategories() {
-        log.debug("Fetching all parent categories");
-        List<CategoryResponse> results = categoryService.getParentCategories();
-        log.info("Successfully fetched {} parent categories", results.size());
-        return ResponseEntity.ok(ApiResponse.success(results, "Parent categories fetched"));
+    // URL: GET /api/v1/categories/0/10/categoryName
+    @GetMapping("/{page}/{size}/{sortBy}")
+    public ResponseEntity<ApiResponse<PageResponse<CategoryResponseDTO>>> getAllCategoriesWithSort(
+            @PathVariable @Min(value = 0, message = "Page index must be zero or positive") int page,
+            @PathVariable @Positive(message = "Page size must be greater than zero") int size,
+            @PathVariable String sortBy) {
+        return ResponseEntity.ok(
+                ApiResponse.success(categoryService.fetchAllCategories(page, size, sortBy, "ASC"), "Categories fetched successfully")
+        );
     }
 
-    @GetMapping("/{categoryId}/children")
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getChildren(@Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId) {
-        log.debug("Fetching child categories for parent ID: {}", categoryId);
-        List<CategoryResponse> results = categoryService.getChildren(categoryId);
-        log.info("Successfully fetched {} child categories for parent ID: {}", results.size(), categoryId);
-        return ResponseEntity.ok(ApiResponse.success(results, "Child categories fetched"));
+    // URL: GET /api/v1/categories/0/10/categoryName/desc
+    @GetMapping("/{page}/{size}/{sortBy}/{sortDirection}")
+    public ResponseEntity<ApiResponse<PageResponse<CategoryResponseDTO>>> getAllCategoriesWithSortDir(
+            @PathVariable @Min(value = 0, message = "Page index must be zero or positive") int page,
+            @PathVariable @Positive(message = "Page size must be greater than zero") int size,
+            @PathVariable String sortBy,
+            @PathVariable @Pattern(regexp = "(?i)asc|desc", message = "Sort direction must be 'ASC' or 'DESC'") String sortDirection) {
+        return ResponseEntity.ok(
+                ApiResponse.success(categoryService.fetchAllCategories(page, size, sortBy, sortDirection), "Categories fetched successfully")
+        );
     }
 
-    @GetMapping("/{categoryId}/products")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProductsByCategory(@Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId) {
-        log.debug("Fetching products for category ID: {}", categoryId);
-        List<ProductResponse> results = productService.getProductsByCategory(categoryId);
-        log.info("Successfully fetched {} products for category ID: {}", results.size(), categoryId);
-        return ResponseEntity.ok(ApiResponse.success(results, "Products fetched by category"));
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ApiResponse<CategoryResponseDTO>> getCategoryById(
+            @PathVariable @Positive(message = "Category ID must be positive") Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.success(categoryService.getCategory(id), "Category details fetched successfully")
+        );
     }
 
-    @PutMapping("/{categoryId}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
-            @Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId,
-            @Valid @RequestBody CategoryRequest request) {
-        log.info("Received request to update category ID: {} with name: {}", categoryId, request.categoryName());
-        CategoryResponse updated = categoryService.updateCategory(categoryId, request);
-        log.info("Successfully updated category ID: {}", categoryId);
-        return ResponseEntity.ok(ApiResponse.success(updated, "Category updated"));
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<CategoryResponseDTO>> updateCategory(
+            @PathVariable @Positive(message = "Category ID must be positive") Long id,
+            @Valid @RequestBody CategoryRequestDTO request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(categoryService.updateCategory(id, request), "Category updated successfully")
+        );
     }
 
-    @DeleteMapping
-    public ResponseEntity<ApiResponse<Void>> deleteCategory(@Positive(message = "Category ID must be a positive number") @PathVariable Long categoryId) {
-        log.info("Received request to delete category ID: {}", categoryId);
-        categoryService.deleteCategory(categoryId);
-        log.info("Successfully deleted category ID: {}", categoryId);
-        return ResponseEntity.ok(ApiResponse.success(null, "Category deleted"));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteCategory(
+            @PathVariable @Positive(message = "Category ID must be positive") Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.ok(
+                ApiResponse.success("Category deleted successfully", "Category deleted successfully")
+        );
     }
 }

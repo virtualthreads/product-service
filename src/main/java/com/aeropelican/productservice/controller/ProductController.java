@@ -1,63 +1,93 @@
 package com.aeropelican.productservice.controller;
 
-import com.aeropelican.productservice.dto.request.ProductRequest;
+import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
+import com.aeropelican.productservice.dto.request.ProductUpdateRequestDTO;
 import com.aeropelican.productservice.dto.response.ApiResponse;
-import com.aeropelican.productservice.dto.response.ProductResponse;
+import com.aeropelican.productservice.dto.response.PageResponse;
+import com.aeropelican.productservice.dto.response.ProductResponseDTO;
 import com.aeropelican.productservice.service.ProductService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
-@Slf4j
+@Validated
 public class ProductController {
 
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody ProductRequest request) {
-        log.info("Received request to create product: {}", request.productName());
-        ProductResponse saved = productService.createProduct(request);
-        log.info("Successfully created product with ID: {}", saved.productId());
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(saved, "Product created"));
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> createProduct(@Valid @RequestBody ProductCreateRequestDTO request) {
+        return new ResponseEntity<>(
+                ApiResponse.success(productService.createProduct(request), "Product created successfully"),
+                HttpStatus.CREATED
+        );
     }
 
-    @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> getProduct(@Positive(message = "Product ID must be a positive number") @PathVariable Long productId) {
-        log.debug("Fetching product with ID: {}", productId);
-        ProductResponse product = productService.getProduct(productId);
-        log.info("Successfully fetched product with ID: {}", productId);
-        return ResponseEntity.ok(ApiResponse.success(product, "Product fetched"));
+    // URL: GET /api/v1/products/0/10
+    @GetMapping("/{page}/{size}")
+    public ResponseEntity<ApiResponse<PageResponse<ProductResponseDTO>>> getAllProducts(
+            @PathVariable @Min(value = 0, message = "Page index must be zero or positive") int page,
+            @PathVariable @Positive(message = "Page size must be greater than zero") int size) {
+        return ResponseEntity.ok(
+                ApiResponse.success(productService.listProducts(page, size, "productId", "ASC"), "Products retrieved successfully")
+        );
     }
 
-    @GetMapping("/brands/{brand}")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProductsByBrand(
-            @NotBlank(message = "Brand name cannot be blank")
-            @Size(min = 1, max = 100, message = "Brand name must be between 1 and 100 characters")
-            @PathVariable String brand) {
-        log.debug("Fetching products for brand: {}", brand);
-        List<ProductResponse> results = productService.getProductsByBrand(brand);
-        log.info("Successfully fetched {} products for brand: {}", results.size(), brand);
-        return ResponseEntity.ok(ApiResponse.success(results, "Products fetched by brand"));
+    // URL: GET /api/v1/products/0/10/brand
+    @GetMapping("/{page}/{size}/{sortBy}")
+    public ResponseEntity<ApiResponse<PageResponse<ProductResponseDTO>>> getAllProductsWithSort(
+            @PathVariable @Min(value = 0, message = "Page index must be zero or positive") int page,
+            @PathVariable @Positive(message = "Page size must be greater than zero") int size,
+            @PathVariable String sortBy) {
+        return ResponseEntity.ok(
+                ApiResponse.success(productService.listProducts(page, size, sortBy, "ASC"), "Products retrieved successfully")
+        );
     }
 
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponse<Void>> deleteProduct(@Positive(message = "Product ID must be a positive number") @PathVariable Long productId) {
-        log.info("Received request to delete product ID: {}", productId);
-        productService.deleteProduct(productId);
-        log.info("Successfully deleted product ID: {}", productId);
-        return ResponseEntity.ok(ApiResponse.success(null, "Product deleted"));
+    // URL: GET /api/v1/products/0/10/brand/desc
+    @GetMapping("/{page}/{size}/{sortBy}/{sortDirection}")
+    public ResponseEntity<ApiResponse<PageResponse<ProductResponseDTO>>> getAllProductsWithSortDir(
+            @PathVariable @Min(value = 0, message = "Page index must be zero or positive") int page,
+            @PathVariable @Positive(message = "Page size must be greater than zero") int size,
+            @PathVariable String sortBy,
+            @PathVariable @Pattern(regexp = "(?i)asc|desc", message = "Sort direction must be 'ASC' or 'DESC'") String sortDirection) {
+        return ResponseEntity.ok(
+                ApiResponse.success(productService.listProducts(page, size, sortBy, sortDirection), "Products retrieved successfully")
+        );
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> getProductById(
+            @PathVariable @Positive(message = "Product ID must be positive") Integer id) {
+        return ResponseEntity.ok(
+                ApiResponse.success(productService.getProduct(id), "Product retrieved successfully")
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductResponseDTO>> updateProduct(
+            @PathVariable @Positive(message = "Product ID must be positive") Integer id,
+            @Valid @RequestBody ProductUpdateRequestDTO request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(productService.updateProduct(id, request), "Product updated successfully")
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteProduct(
+            @PathVariable @Positive(message = "Product ID must be positive") Integer id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok(
+                ApiResponse.success("Product deleted successfully", "Product deleted successfully")
+        );
     }
 }

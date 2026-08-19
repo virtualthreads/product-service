@@ -1,17 +1,17 @@
 package com.aeropelican.productservice.repository;
 
-import com.aeropelican.productservice.entity.ProductVariant;
+import com.aeropelican.productservice.entity.ProductVariants;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
-
 
 @Repository
-public interface ProductVariantRepository extends JpaRepository<ProductVariant, Long> {
-    List<ProductVariant> findByProduct_ProductId(Long productId);
+public interface ProductVariantsRepository extends JpaRepository<ProductVariants, Long> {
 
-    Optional<ProductVariant> findByProduct_ProductIdAndVariantId(Long productId, Long variantId);
+    // Find all variants for a given product
+    List<ProductVariants> findByProduct_ProductId(Integer productId);
+
+    // Find variants by name if needed
+    List<ProductVariants> findByVariantNameIgnoreCase(String variantName);
 }
