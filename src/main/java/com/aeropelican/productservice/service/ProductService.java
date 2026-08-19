@@ -1,5 +1,8 @@
 package com.aeropelican.productservice.service;
 
+import com.aeropelican.productservice.client.dto.ApiResponse;
+import com.aeropelican.productservice.client.dto.UserResponse;
+import com.aeropelican.productservice.client.userclients.UserClient;
 import com.aeropelican.productservice.dto.request.ProductRequest;
 import com.aeropelican.productservice.dto.request.ProductSearchRequest;
 import com.aeropelican.productservice.dto.response.ProductResponse;
@@ -24,9 +27,21 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
+    private final UserClient userClient;
 
     public ProductResponse createProduct(ProductRequest request) {
         log.info("Attempting to create product: {}", request.productName());
+        log.debug("Verifying if user with userId:{} is present", request.userId());
+
+        log.debug("Forwarding the request to the User-Service");
+        com.aeropelican.productservice.client.dto.ApiResponse<UserResponse> usrResponse = userClient.retrieveUserDetails(request.userId());
+        if (usrResponse.isSuccess() && usrResponse.getData() != null) {
+            log.info("User found with provided UUID: {}", request.userId());
+            UserResponse userResponse = usrResponse.getData();
+            log.debug("User Details: FirstName-{}, LastName-{}", userResponse.firstName(), userResponse.lastName());
+        } else {
+            throw new ResourceNotFoundException("User", request.userId().toString());
+        }
         if (request.categoryId() != null && !categoryRepository.existsById(request.categoryId())) {
             log.error("Category not found with ID: {} for product creation", request.categoryId());
             throw new ResourceNotFoundException("Category", String.valueOf(request.categoryId()));

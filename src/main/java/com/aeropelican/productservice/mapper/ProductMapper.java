@@ -2,6 +2,7 @@ package com.aeropelican.productservice.mapper;
 
 import com.aeropelican.productservice.dto.request.ProductRequest;
 import com.aeropelican.productservice.dto.response.ProductResponse;
+import com.aeropelican.productservice.entity.Category;
 import com.aeropelican.productservice.entity.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,12 +17,15 @@ public class ProductMapper {
 
     public Product toEntity(ProductRequest request) {
         Product product = new Product();
-        //product.setCategoryId(request.categoryId());
+        Category category = new Category();
+        category.setCategoryId(1l);
+        product.setCategory(category);
         product.setProductName(request.productName());
         product.setDescription(request.description());
         product.setBrand(request.brand());
         product.setIsActive(request.isActive() != null ? request.isActive() : true);
         product.setCreateAt(LocalDateTime.now());
+        product.setUpdatedAt(LocalDateTime.now());
         return product;
     }
 

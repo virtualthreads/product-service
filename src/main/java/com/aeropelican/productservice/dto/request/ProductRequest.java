@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
+import java.util.UUID;
+
 public record ProductRequest(
         @Positive(message = "Category ID must be a positive number")
         Long categoryId,
@@ -21,6 +23,7 @@ public record ProductRequest(
         @Pattern(regexp = "^[a-zA-Z0-9\\s\\-&.,']+$", message = "Brand can only contain letters, numbers, spaces, hyphens, ampersands, dots, commas, and single quotes")
         String brand,
 
-        Boolean isActive
+        Boolean isActive,
+        UUID userId
 ) {
 }
