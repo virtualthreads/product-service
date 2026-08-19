@@ -5,8 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VariantAttributeRepository extends JpaRepository<VariantAttribute, Long> {
-    List<VariantAttribute> findByVariantId(Long variantId);
+
+    List<VariantAttribute> findByProductVariant_VariantId(Long variantId);
+
+    Optional<VariantAttribute> findByProductVariant_VariantIdAndAttrName(Long variantId, String attrName);
 }

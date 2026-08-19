@@ -1,21 +1,19 @@
 package com.aeropelican.productservice.dto.response;
 
-import com.aeropelican.productservice.entity.Category;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-
 @Data
 @Builder
-
-public class CategoryResponseDTO {
-    private Long categoryId;
-    private String categoryName;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ProductResponseDTO {
+    private Integer productId;
+    private String productName;
     private String description;
-    private Category parentCategory;
+    private String brand;
     private Boolean isActive = true;
     private LocalDateTime createAt;
     private LocalDateTime updatedAt;

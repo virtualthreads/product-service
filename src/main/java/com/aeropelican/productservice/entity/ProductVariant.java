@@ -1,45 +1,35 @@
 package com.aeropelican.productservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.Data;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
-
-
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "product_variants")
-public class ProductVariant {
+@Data
+public class ProductVariants {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "variant_id", nullable = false)
-    private Long variantId;
+    @Column(name = "variant_id")
+    private Integer variantId;
 
-    @Column(name = "sku", nullable = false, length = 50)
-    private String sku;
+    @Column(name = "variant_name")
+    private String variantName;
 
-    @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    @Column(name = "color")
+    private String color;
 
-    @ColumnDefault("1")
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    @Column(name = "size")
+    private String size;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "price")
+    private Double price;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "stock")
+    private Integer stock;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;

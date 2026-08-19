@@ -1,22 +1,21 @@
 package com.aeropelican.productservice.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductVariantResponseDTO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductVariantsResponseDTO {
     private Long variantId;
-    private String sku;
+    private String variantName;
     private String color;
-    private String storageCapacity;
+    private String size;
     private BigDecimal price;
-    private Boolean isActive;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Long productId;
 }

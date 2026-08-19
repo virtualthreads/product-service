@@ -1,55 +1,38 @@
 package com.aeropelican.productservice.mapper;
 
-import com.aeropelican.productservice.dto.request.CategoryRequest;
-import com.aeropelican.productservice.dto.response.CategoryResponse;
+import com.aeropelican.productservice.dto.request.CategoryRequestDTO;
+import com.aeropelican.productservice.dto.response.CategoryResponseDTO;
 import com.aeropelican.productservice.entity.Category;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
-@Component
-@RequiredArgsConstructor
 public class CategoryMapper {
 
-    private final ProductMapper productMapper;
-
-    public CategoryResponse toResponse(Category category) {
-        return CategoryResponse.builder()
-                .categoryId(category.getCategoryId())
-                .categoryName(category.getCategoryName())
-                .description(category.getDescription())
-                .parentCategoryId(category.getParentCategoryId())
-                .isActive(category.getIsActive())
-                .createdAt(category.getCreateAt())
-                .updatedAt(category.getUpdatedAt())
-                .build();
-    }
-
-    public CategoryResponse toResponseWithProducts(Category category) {
-        return CategoryResponse.builder()
-                .categoryId(category.getCategoryId())
-                .categoryName(category.getCategoryName())
-                .description(category.getDescription())
-                .parentCategoryId(category.getParentCategoryId())
-                .isActive(category.getIsActive())
-                .createdAt(category.getCreateAt())
-                .updatedAt(category.getUpdatedAt())
-                .products(category.getProducts()
-                        .stream()
-                        .map(productMapper::toResponse)
-                        .toList()
-                )
-                .build();
-    }
-
-    public Category toEntity(CategoryRequest categoryRequest) {
+    public static Category toEntity(CategoryRequestDTO request) {
+        if (request == null) {
+            return null;
+        }
         return Category.builder()
-                .categoryName(categoryRequest.categoryName())
-                .description(categoryRequest.description())
-                .parentCategoryId(categoryRequest.parentCategoryId())
-                .isActive(false)
-                .createAt(LocalDateTime.now())
+                .categoryName(request.getCategoryName())
+                .description(request.getDescription())
+                .isActive(request.getActive() != null ? request.getActive() : true)
+                .build();
+    }
+
+    public static CategoryResponseDTO toDTO(Category category) {
+        if (category == null) {
+            return null;
+        }
+
+        // THESE TWO LINES ARE WHAT PRINT THE MESSAGES TO THE CONSOLE:
+        System.out.println("Before fetching product entity");
+        System.out.println("Attempting to fetch product entity");
+
+        return CategoryResponseDTO.builder()
+                .categoryId(category.getCategoryId())
+                .categoryName(category.getCategoryName())
+                .description(category.getDescription())
+                .isActive(category.getIsActive())
+                .createAt(category.getCreateAt())
+                .updatedAt(category.getUpdatedAt())
                 .build();
     }
 }

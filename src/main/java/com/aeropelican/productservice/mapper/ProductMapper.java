@@ -1,60 +1,45 @@
 package com.aeropelican.productservice.mapper;
 
-import com.aeropelican.productservice.dto.request.ProductRequest;
-import com.aeropelican.productservice.dto.response.ProductResponse;
-import com.aeropelican.productservice.entity.Category;
+import com.aeropelican.productservice.dto.request.ProductCreateRequestDTO;
+import com.aeropelican.productservice.dto.response.ProductResponseDTO;
 import com.aeropelican.productservice.entity.Product;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@Component
-@RequiredArgsConstructor
 public class ProductMapper {
 
-    private final ProductVariantMapper productVariantMapper;
+    public static Product toEntity(ProductCreateRequestDTO requestDTO) {
+        if (requestDTO == null) {
+            return null;
+        }
 
-    public Product toEntity(ProductRequest request) {
         Product product = new Product();
-        Category category = new Category();
-        category.setCategoryId(1l);
-        product.setCategory(category);
-        product.setProductName(request.productName());
-        product.setDescription(request.description());
-        product.setBrand(request.brand());
-        product.setIsActive(request.isActive() != null ? request.isActive() : true);
+        product.setProductName(requestDTO.getProductName());
+        product.setDescription(requestDTO.getDescription());
+        product.setBrand(requestDTO.getBrand());
+        product.setIsActive(requestDTO.getIsActive());
         product.setCreateAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
         return product;
     }
 
-    public ProductResponse toResponse(Product product) {
-        return ProductResponse.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .description(product.getDescription())
-                .brand(product.getBrand())
-                .isActive(product.getIsActive())
-                .createdAt(product.getCreateAt())
-                .updatedAt(product.getUpdatedAt())
-                .build();
-    }
+    public static ProductResponseDTO toResponseDTO(Product product) {
+        if (product == null) {
+            return null;
+        }
 
-    public ProductResponse toResponseWithVariants(Product product) {
-        return ProductResponse.builder()
+        // Print statements for tracking execution in console
+        System.out.println("Before fetching product entity");
+        System.out.println("Attempting to fetch product entity");
+
+        return ProductResponseDTO.builder()
                 .productId(product.getProductId())
                 .productName(product.getProductName())
                 .description(product.getDescription())
                 .brand(product.getBrand())
                 .isActive(product.getIsActive())
-                .createdAt(product.getCreateAt())
+                .createAt(product.getCreateAt())
                 .updatedAt(product.getUpdatedAt())
-                .variants(product.getVariants()
-                        .stream()
-                        .map(productVariantMapper::toResponse)
-                        .toList()
-                )
                 .build();
     }
 }
