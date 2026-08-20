@@ -2,20 +2,40 @@ package com.aeropelican.productservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+
+@Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiResponse<T>(
-        T data,
-        boolean success,
-        String message,
-        ErrorResponse error
-) {
+public class ApiResponse<T> {
+    private T data;
+    private boolean success;
+    private String message;
+    private ErrorResponse error;
+    private LocalDateTime timestamp;
+
     public static <T> ApiResponse<T> success(T data, String message) {
-        return new ApiResponse<>(data, true, message, null);
+        return ApiResponse.<T>builder()
+                .data(data)
+                .success(true)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    public static <T> ApiResponse<T> success(T data) {
+        return success(data, "Operation successful");
     }
 
     public static <T> ApiResponse<T> failure(String message, ErrorResponse error) {
-        return new ApiResponse<>(null, false, message, error);
+        return ApiResponse.<T>builder()
+                .data(null)
+                .success(false)
+                .message(message)
+                .error(error)
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 }

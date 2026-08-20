@@ -4,6 +4,8 @@ import com.aeropelican.productservice.dto.response.ApiResponse;
 import com.aeropelican.productservice.dto.response.ErrorResponse;
 import com.aeropelican.productservice.dto.response.FieldError;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +17,16 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
+        logger.warn("Resource not found: {}", ex.getMessage());
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode("RESOURCE_NOT_FOUND")
                 .status(HttpStatus.NOT_FOUND.value())
@@ -30,17 +34,12 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .error(errorResponse)
-                        .message(ex.getMessage())
-                        //.timestamp(LocalDateTime.now())
-                        .build()
-                );
+                .body(ApiResponse.<Void>failure(ex.getMessage(), errorResponse));
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
+        logger.warn("Bad request: {}", ex.getMessage());
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode("BAD_REQUEST")
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -52,6 +51,7 @@ public class GlobalExceptionHandler {
     // Generic Exceptions
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ApiResponse<Void>> handleMissingParams(MissingServletRequestParameterException ex, HttpServletRequest request) {
+        logger.warn("Missing request parameter: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.builder()
                 .errorCode("MISSING_PARAMETER")
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -62,6 +62,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        logger.warn("Type mismatch: {}", ex.getMessage());
 
         String message = String.format("Parameter '%s' should be of type %s", ex.getName(), ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "a different type");
 
@@ -99,6 +100,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoHandlerFound(NoHandlerFoundException ex, HttpServletRequest request) {
+        logger.warn("No handler found for request: {}", request.getRequestURI());
         ErrorResponse error = ErrorResponse.builder()
                 .errorCode("ROUTE_NOT_FOUND")
                 .status(HttpStatus.NOT_FOUND.value())
@@ -109,6 +111,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ApiResponse<Void>> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpServletRequest request) {
+        logger.warn("Handler method validation failed: {}", ex.getMessage());
 
         List<FieldError> errors = ex.getParameterValidationResults()
                 .stream()
@@ -136,6 +139,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PropertyReferenceException.class)
     public ResponseEntity<ApiResponse<Void>> handlePropertyReferenceException(PropertyReferenceException ex, HttpServletRequest request) {
+        logger.error("Property reference error: {}", ex.getMessage());
 
         String message = String.format("Invalid property '%s'. Please provide a valid property name.", ex.getPropertyName());
 
@@ -150,6 +154,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex, HttpServletRequest request) {
+        logger.error("Unhandled exception caught in GlobalExceptionHandler: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode("INTERNAL_SERVER_ERROR")
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
