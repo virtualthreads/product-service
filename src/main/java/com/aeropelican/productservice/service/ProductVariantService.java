@@ -34,7 +34,6 @@ public class ProductVariantService {
                 .map(productVariantMapper::toResponse)
                 .toList();
     }
-
     public ProductVariantResponse getProductVariant(Long productId, Long variantId) {
         log.debug("Fetching variant ID: {} for product ID: {}", variantId, productId);
         productRepository.findById(productId)

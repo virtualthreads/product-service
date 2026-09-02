@@ -100,7 +100,6 @@ public class CategoryService {
         log.info("Successfully updated category ID: {}", categoryId);
         return response;
     }
-
     public void deleteCategory(Long categoryId) {
         log.info("Attempting to delete category ID: {}", categoryId);
         Category category = categoryRepository.findById(categoryId)
