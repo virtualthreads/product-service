@@ -1,5 +1,6 @@
 package com.aeropelican.productservice.service;
 
+import com.aeropelican.productservice.annotations.MethodExecutionTime;
 import com.aeropelican.productservice.client.dto.ApiResponse;
 import com.aeropelican.productservice.client.dto.UserResponse;
 import com.aeropelican.productservice.client.userclients.UserClient;
@@ -57,6 +58,7 @@ public class ProductService {
         return response;
     }
 
+    @MethodExecutionTime
     @Cacheable(value = "Get-product-details", key = "#productId")
     public ProductResponse getProduct(Long productId) {
         log.debug("Fetching product with ID: {}", productId);
